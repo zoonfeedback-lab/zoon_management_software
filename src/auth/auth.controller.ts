@@ -1,23 +1,24 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { SuperAdminLoginDto } from './dto/super-admin-login.dto';
+import { LoginDto } from './dto/login.dto';
+import { JwtAuthGuard } from './guards/jwt-auth.guard';
+import { CurrentUser } from './decorators/current-user.decorator';
+import type { AuthenticatedUser } from './interfaces/authenticated-request.interface';
 
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  @Post('super-admin/login')
-  async loginSuperAdmin(@Body() dto: SuperAdminLoginDto): Promise<{
-    data: {
-      accessToken: string;
-      superAdmin: {
-        id: string;
-        email: string;
-        fullName: string;
-      };
-    };
-  }> {
-    const data = await this.authService.loginSuperAdmin(dto);
+  @Post('login')
+  async login(@Body() dto: LoginDto) {
+    const data = await this.authService.login(dto);
+    return { data };
+  }
+
+  @Get('me')
+  @UseGuards(JwtAuthGuard)
+  async getMe(@CurrentUser() user: AuthenticatedUser) {
+    const data = await this.authService.getMe(user.id);
     return { data };
   }
 }

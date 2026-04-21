@@ -1,32 +1,30 @@
 import {
   CanActivate,
   ExecutionContext,
-  ForbiddenException,
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from '../../prisma/prisma.service';
-import { AuthenticatedRequest } from '../interfaces/authenticated-request.interface';
+import { RoleKey } from '@prisma/client';
 
 interface JwtPayload {
   sub: string;
   email: string;
-  role: 'SUPER_ADMIN';
+  role: RoleKey;
 }
 
 @Injectable()
-export class SuperAdminAuthGuard implements CanActivate {
+export class JwtAuthGuard implements CanActivate {
   constructor(
     private readonly jwtService: JwtService,
     private readonly prisma: PrismaService,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    const request = context
-      .switchToHttp()
-      .getRequest<AuthenticatedRequest & { headers: Record<string, string> }>();
+    const request = context.switchToHttp().getRequest();
     const authHeader = request.headers.authorization;
+
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       throw new UnauthorizedException('Missing Bearer token');
     }
@@ -43,22 +41,28 @@ export class SuperAdminAuthGuard implements CanActivate {
       throw new UnauthorizedException('Invalid or expired token');
     }
 
-    if (payload.role !== 'SUPER_ADMIN') {
-      throw new ForbiddenException('Only Super Admin can access this resource');
-    }
-
-    const superAdmin = await this.prisma.superAdmin.findUnique({
+    const user = await this.prisma.user.findUnique({
       where: { id: payload.sub },
-      select: { id: true, email: true, isActive: true },
+      select: {
+        id: true,
+        email: true,
+        fullName: true,
+        role: {
+          select: { key: true },
+        },
+        isActive: true,
+      },
     });
 
-    if (!superAdmin || !superAdmin.isActive) {
-      throw new UnauthorizedException('Super Admin is not active');
+    if (!user || !user.isActive) {
+      throw new UnauthorizedException('User account is not active');
     }
 
-    request.superAdmin = {
-      id: superAdmin.id,
-      email: superAdmin.email,
+    request.user = {
+      id: user.id,
+      email: user.email,
+      fullName: user.fullName,
+      role: user.role.key,
     };
 
     return true;
