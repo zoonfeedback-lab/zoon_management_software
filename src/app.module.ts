@@ -5,7 +5,10 @@ import { AppService } from './app.service';
 import { PrismaModule } from './prisma/prisma.module';
 import { AuthModule } from './auth/auth.module';
 import { ClientsModule } from './clients/clients.module';
-import { TeamModule } from './team/team.module';
+import { UsersModule } from './users/users.module';
+import { ProjectsModule } from './projects/projects.module';
+import { TasksModule } from './tasks/tasks.module';
+import { CommentsModule } from './comments/comments.module';
 
 @Module({
   imports: [
@@ -15,7 +18,10 @@ import { TeamModule } from './team/team.module';
     PrismaModule,
     AuthModule,
     ClientsModule,
-    TeamModule,
+    UsersModule,
+    ProjectsModule,
+    TasksModule,
+    CommentsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

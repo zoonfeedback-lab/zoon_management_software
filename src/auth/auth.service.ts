@@ -2,7 +2,7 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { PrismaService } from '../prisma/prisma.service';
-import { SuperAdminLoginDto } from './dto/super-admin-login.dto';
+import { LoginDto } from './dto/login.dto';
 
 @Injectable()
 export class AuthService {
@@ -11,40 +11,72 @@ export class AuthService {
     private readonly jwtService: JwtService,
   ) {}
 
-  async loginSuperAdmin(dto: SuperAdminLoginDto): Promise<{
-    accessToken: string;
-    superAdmin: {
-      id: string;
-      email: string;
-      fullName: string;
-    };
-  }> {
-    const superAdmin = await this.prisma.superAdmin.findUnique({
+  async login(dto: LoginDto) {
+    const user = await this.prisma.user.findUnique({
       where: { email: dto.email.toLowerCase().trim() },
+      include: { role: true },
     });
 
-    if (!superAdmin || !superAdmin.isActive) {
+    if (!user || !user.isActive) {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    const isPasswordValid = await bcrypt.compare(dto.password, superAdmin.passwordHash);
+    const isPasswordValid = await bcrypt.compare(
+      dto.password,
+      user.passwordHash,
+    );
     if (!isPasswordValid) {
       throw new UnauthorizedException('Invalid credentials');
     }
 
     const accessToken = await this.jwtService.signAsync({
-      sub: superAdmin.id,
-      email: superAdmin.email,
-      role: 'SUPER_ADMIN',
+      sub: user.id,
+      email: user.email,
+      role: user.role,
     });
 
     return {
       accessToken,
-      superAdmin: {
-        id: superAdmin.id,
-        email: superAdmin.email,
-        fullName: superAdmin.fullName,
+      user: {
+        id: user.id,
+        email: user.email,
+        fullName: user.fullName,
+        role: user.role.key,
       },
+    };
+  }
+
+  async getMe(userId: string) {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        id: true,
+        email: true,
+        fullName: true,
+        role: {
+          select: {
+            key: true,
+          },
+        },
+        phone: true,
+        jobTitle: true,
+        department: true,
+        experienceLevel: true,
+        skills: true,
+        availabilityStatus: true,
+        isActive: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
+
+    if (!user) {
+      throw new UnauthorizedException('User not found');
+    }
+
+    return {
+      ...user,
+      role: user.role.key,
     };
   }
 }

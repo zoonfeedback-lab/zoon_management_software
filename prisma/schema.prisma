@@ -1,0 +1,158 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum RoleKey {
+  ADMIN
+  TEAM_MEMBER
+}
+
+enum ProjectStatus {
+  DRAFT
+  ACTIVE
+  COMPLETED
+}
+
+enum TaskStatus {
+  TODO
+  IN_PROGRESS
+  DONE
+}
+
+enum AvailabilityStatus {
+  AVAILABLE
+  BUSY
+  ON_LEAVE
+}
+
+model Role {
+  id        String   @id @default(uuid())
+  key       RoleKey  @unique
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  users     User[]
+
+  @@map("roles")
+}
+
+model User {
+  id                 String             @id @default(uuid())
+  email              String             @unique
+  passwordHash       String
+  fullName           String
+  isActive           Boolean            @default(true)
+  phone              String?
+  jobTitle           String?
+  department         String?
+  experienceLevel    String?
+  skills             String[]           @default([])
+  availabilityStatus AvailabilityStatus @default(AVAILABLE)
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
+  roleId             String
+  role               Role               @relation(fields: [roleId], references: [id])
+  projectMembers     ProjectMember[]
+  assignedTasks      Task[]             @relation("AssignedTo")
+  comments           TaskComment[]
+
+  @@index([roleId])
+  @@map("users")
+}
+
+// ─── CLIENTS ────────────────────────────────────────
+
+model Client {
+  id            String    @id @default(uuid())
+  companyName   String
+  contactPerson String
+  email         String    @unique
+  phone         String?
+  isActive      Boolean   @default(true)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  projects      Project[]
+
+  @@map("clients")
+}
+
+// ─── PROJECTS ───────────────────────────────────────
+
+model Project {
+  id          String        @id @default(uuid())
+  name        String
+  description String?
+  status      ProjectStatus @default(DRAFT)
+  startDate   DateTime?
+  deadline    DateTime?
+  isActive    Boolean       @default(true)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  clientId    String
+  client      Client        @relation(fields: [clientId], references: [id])
+  members     ProjectMember[]
+  tasks       Task[]
+
+  @@index([clientId])
+  @@map("projects")
+}
+
+// ─── PROJECT MEMBERS (many-to-many) ─────────────────
+
+model ProjectMember {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  projectId String
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([projectId, userId])
+  @@index([projectId])
+  @@index([userId])
+  @@map("project_members")
+}
+
+// ─── TASKS ──────────────────────────────────────────
+
+model Task {
+  id           String      @id @default(uuid())
+  title        String
+  description  String?
+  status       TaskStatus  @default(TODO)
+  priority     String      @default("MEDIUM")
+  dueDate      DateTime?
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+  projectId    String
+  project      Project     @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  assignedToId String?
+  assignedTo   User?       @relation("AssignedTo", fields: [assignedToId], references: [id])
+  comments     TaskComment[]
+
+  @@index([projectId])
+  @@index([assignedToId])
+  @@map("tasks")
+}
+
+// ─── TASK COMMENTS ──────────────────────────────────
+
+model TaskComment {
+  id        String   @id @default(uuid())
+  content   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  taskId    String
+  task      Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@index([taskId])
+  @@index([userId])
+  @@map("task_comments")
+}
