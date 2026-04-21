@@ -39,6 +39,18 @@ export class ClientsService {
     });
   }
 
+  async findOne(id: string) {
+    const client = await this.prisma.client.findUnique({
+      where: { id },
+    });
+
+    if (!client) {
+      throw new NotFoundException('Client not found');
+    }
+
+    return client;
+  }
+
   async update(id: string, dto: UpdateClientDto) {
     await this.ensureExists(id);
     try {
@@ -62,14 +74,6 @@ export class ClientsService {
     }
   }
 
-  async deactivate(id: string) {
-    return this.setActive(id, false);
-  }
-
-  async reactivate(id: string) {
-    return this.setActive(id, true);
-  }
-
   private async ensureExists(id: string) {
     const record = await this.prisma.client.findUnique({
       where: { id },
@@ -80,11 +84,4 @@ export class ClientsService {
     }
   }
 
-  private async setActive(id: string, isActive: boolean) {
-    await this.ensureExists(id);
-    return this.prisma.client.update({
-      where: { id },
-      data: { isActive },
-    });
-  }
 }

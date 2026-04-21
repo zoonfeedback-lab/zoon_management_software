@@ -13,7 +13,7 @@ import { RolesGuard } from './guards/roles.guard';
       useFactory: (configService: ConfigService) => ({
         secret: configService.get<string>('JWT_SECRET') ?? 'change-this-secret',
         signOptions: {
-          expiresIn: configService.get<string>('JWT_EXPIRES_IN') ?? '1d',
+          expiresIn: '1d',
         },
       }),
     }),

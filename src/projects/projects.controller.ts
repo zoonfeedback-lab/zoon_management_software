@@ -9,34 +9,34 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { RoleKey } from '@prisma/client';
-import { ClientsService } from './clients.service';
-import { CreateClientDto } from './dto/create-client.dto';
-import { UpdateClientDto } from './dto/update-client.dto';
+import { Roles } from '../auth/decorators/roles.decorator';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
-import { Roles } from '../auth/decorators/roles.decorator';
+import { CreateProjectDto } from './dto/create-project.dto';
+import { UpdateProjectDto } from './dto/update-project.dto';
+import { ProjectsService } from './projects.service';
 
-@Controller('clients')
+@Controller('projects')
 @UseGuards(JwtAuthGuard, RolesGuard)
-export class ClientsController {
-  constructor(private readonly clientsService: ClientsService) {}
+export class ProjectsController {
+  constructor(private readonly projectsService: ProjectsService) {}
 
   @Post()
   @Roles(RoleKey.ADMIN)
-  async create(@Body() dto: CreateClientDto) {
-    const data = await this.clientsService.create(dto);
+  async create(@Body() dto: CreateProjectDto) {
+    const data = await this.projectsService.create(dto);
     return { data };
   }
 
   @Get()
   async findAll() {
-    const data = await this.clientsService.findAll();
+    const data = await this.projectsService.findAll();
     return { data };
   }
 
   @Get(':id')
   async findOne(@Param('id', new ParseUUIDPipe()) id: string) {
-    const data = await this.clientsService.findOne(id);
+    const data = await this.projectsService.findOne(id);
     return { data };
   }
 
@@ -44,9 +44,9 @@ export class ClientsController {
   @Roles(RoleKey.ADMIN)
   async update(
     @Param('id', new ParseUUIDPipe()) id: string,
-    @Body() dto: UpdateClientDto,
+    @Body() dto: UpdateProjectDto,
   ) {
-    const data = await this.clientsService.update(id, dto);
+    const data = await this.projectsService.update(id, dto);
     return { data };
   }
 }
