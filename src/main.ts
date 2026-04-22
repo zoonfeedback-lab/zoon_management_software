@@ -1,4 +1,5 @@
 import { ValidationPipe } from '@nestjs/common';
+import { RequestMethod } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
@@ -9,7 +10,9 @@ async function bootstrap() {
   const vercelUrl = process.env.VERCEL_URL;
 
   if (isVercel) {
-    app.setGlobalPrefix('api');
+    app.setGlobalPrefix('api', {
+      exclude: [{ path: 'health', method: RequestMethod.GET }],
+    });
   }
 
   app.useGlobalPipes(
