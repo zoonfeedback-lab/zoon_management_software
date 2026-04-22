@@ -8,9 +8,16 @@ export class AppController {
   constructor(private readonly appService: AppService) {}
 
   @Get()
-  @ApiOperation({ summary: 'Health check endpoint' })
+  @ApiOperation({ summary: 'Welcome endpoint' })
   @ApiOkResponse({ description: 'Returns welcome message.' })
   getHello(): string {
     return this.appService.getHello();
+  }
+
+  @Get('health')
+  @ApiOperation({ summary: 'Service health check endpoint' })
+  @ApiOkResponse({ description: 'Returns service health status.' })
+  getHealth() {
+    return { status: 'ok' };
   }
 }

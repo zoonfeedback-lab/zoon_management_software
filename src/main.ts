@@ -5,6 +5,13 @@ import { AppModule } from './app.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  const isVercel = process.env.VERCEL === '1';
+  const vercelUrl = process.env.VERCEL_URL;
+
+  if (isVercel) {
+    app.setGlobalPrefix('api');
+  }
+
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
@@ -13,14 +20,19 @@ async function bootstrap() {
     }),
   );
 
-  const config = new DocumentBuilder()
+  const docsConfig = new DocumentBuilder()
     .setTitle('Zoon Management Software API')
     .setDescription('API documentation for the Zoon Management Software backend.')
     .setVersion('1.0')
     .addBearerAuth()
-    .build();
-  const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api/docs', app, document);
+    .addServer(isVercel ? '/api' : '/');
+
+  if (vercelUrl) {
+    docsConfig.addServer(`https://${vercelUrl}/api`);
+  }
+
+  const document = SwaggerModule.createDocument(app, docsConfig.build());
+  SwaggerModule.setup('docs', app, document);
 
   await app.listen(process.env.PORT ?? 3000);
 }
