@@ -1,6 +1,7 @@
 import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import type { Request, Response } from 'express';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
@@ -33,6 +34,12 @@ async function bootstrap() {
 
   const document = SwaggerModule.createDocument(app, docsConfig.build());
   SwaggerModule.setup('docs', app, document);
+
+  // Local alias so /api/docs works like Vercel-style paths.
+  const httpAdapter = app.getHttpAdapter();
+  const server = httpAdapter.getInstance();
+  server.get('/api/docs', (_req: Request, res: Response) => res.redirect('/docs'));
+  server.get('/api/docs-json', (_req: Request, res: Response) => res.json(document));
 
   await app.listen(process.env.PORT ?? 3000);
 }
