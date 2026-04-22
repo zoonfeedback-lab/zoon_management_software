@@ -8,6 +8,15 @@ import {
   Post,
   UseGuards,
 } from '@nestjs/common';
+import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiOkResponse,
+  ApiOperation,
+  ApiParam,
+  ApiTags,
+  ApiUnauthorizedResponse,
+} from '@nestjs/swagger';
 import { RoleKey } from '@prisma/client';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { Roles } from '../auth/decorators/roles.decorator';
@@ -20,11 +29,17 @@ import { UsersService } from './users.service';
 
 @Controller('users')
 @UseGuards(JwtAuthGuard, RolesGuard)
+@ApiTags('Users')
+@ApiBearerAuth()
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Post()
   @Roles(RoleKey.ADMIN)
+  @ApiOperation({ summary: 'Create a new user (admin only)' })
+  @ApiBody({ type: CreateUserDto })
+  @ApiOkResponse({ description: 'User created successfully.' })
+  @ApiUnauthorizedResponse({ description: 'Missing or invalid token.' })
   async create(@Body() dto: CreateUserDto) {
     const data = await this.usersService.create(dto);
     return { data };
@@ -32,12 +47,19 @@ export class UsersController {
 
   @Get()
   @Roles(RoleKey.ADMIN)
+  @ApiOperation({ summary: 'List all users (admin only)' })
+  @ApiOkResponse({ description: 'Returns all users.' })
+  @ApiUnauthorizedResponse({ description: 'Missing or invalid token.' })
   async findAll() {
     const data = await this.usersService.findAll();
     return { data };
   }
 
   @Get(':id')
+  @ApiOperation({ summary: 'Get user by id' })
+  @ApiParam({ name: 'id', description: 'User id (UUID)' })
+  @ApiOkResponse({ description: 'Returns user details.' })
+  @ApiUnauthorizedResponse({ description: 'Missing or invalid token.' })
   async findOne(
     @Param('id', new ParseUUIDPipe()) id: string,
     @CurrentUser() user: AuthenticatedUser,
@@ -47,6 +69,11 @@ export class UsersController {
   }
 
   @Patch(':id')
+  @ApiOperation({ summary: 'Update user by id' })
+  @ApiParam({ name: 'id', description: 'User id (UUID)' })
+  @ApiBody({ type: UpdateUserDto })
+  @ApiOkResponse({ description: 'User updated successfully.' })
+  @ApiUnauthorizedResponse({ description: 'Missing or invalid token.' })
   async update(
     @Param('id', new ParseUUIDPipe()) id: string,
     @Body() dto: UpdateUserDto,
