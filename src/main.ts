@@ -40,8 +40,9 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, docsConfig.build());
   const httpAdapter = app.getHttpAdapter();
   const server = httpAdapter.getInstance();
-  const swaggerPath = isVercel ? 'api/docs' : 'docs';
-  SwaggerModule.setup(swaggerPath, app, document);
+  SwaggerModule.setup('docs', app, document, {
+    useGlobalPrefix: isVercel,
+  });
 
   if (isVercel) {
     server.get('/docs', (_req: Request, res: Response) => res.redirect('/api/docs'));
