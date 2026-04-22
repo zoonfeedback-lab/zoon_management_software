@@ -38,13 +38,19 @@ async function bootstrap() {
   }
 
   const document = SwaggerModule.createDocument(app, docsConfig.build());
-  SwaggerModule.setup('docs', app, document);
-
-  // Local alias so /api/docs works like Vercel-style paths.
   const httpAdapter = app.getHttpAdapter();
   const server = httpAdapter.getInstance();
-  server.get('/api/docs', (_req: Request, res: Response) => res.redirect('/docs'));
-  server.get('/api/docs-json', (_req: Request, res: Response) => res.json(document));
+  const swaggerPath = isVercel ? 'api/docs' : 'docs';
+  SwaggerModule.setup(swaggerPath, app, document);
+
+  if (isVercel) {
+    server.get('/docs', (_req: Request, res: Response) => res.redirect('/api/docs'));
+    server.get('/docs-json', (_req: Request, res: Response) => res.redirect('/api/docs-json'));
+  } else {
+    // Local aliases so both /docs and /api/docs work.
+    server.get('/api/docs', (_req: Request, res: Response) => res.redirect('/docs'));
+    server.get('/api/docs-json', (_req: Request, res: Response) => res.json(document));
+  }
 
   await app.listen(process.env.PORT ?? 3000);
 }
