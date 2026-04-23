@@ -11,6 +11,9 @@ import {
 import {
   ApiBearerAuth,
   ApiBody,
+  ApiCreatedResponse,
+  ApiForbiddenResponse,
+  ApiNotFoundResponse,
   ApiOkResponse,
   ApiOperation,
   ApiParam,
@@ -38,7 +41,8 @@ export class TasksController {
   @Roles(RoleKey.ADMIN)
   @ApiOperation({ summary: 'Create task (admin only)' })
   @ApiBody({ type: CreateTaskDto })
-  @ApiOkResponse({ description: 'Task created successfully.' })
+  @ApiCreatedResponse({ description: 'Task created successfully.' })
+  @ApiForbiddenResponse({ description: 'Only admins can create tasks.' })
   @ApiUnauthorizedResponse({ description: 'Missing or invalid token.' })
   async create(@Body() dto: CreateTaskDto) {
     const data = await this.tasksService.create(dto);
@@ -58,6 +62,7 @@ export class TasksController {
   @ApiOperation({ summary: 'Get task by id' })
   @ApiParam({ name: 'id', description: 'Task id (UUID)' })
   @ApiOkResponse({ description: 'Returns task details.' })
+  @ApiNotFoundResponse({ description: 'Task not found.' })
   @ApiUnauthorizedResponse({ description: 'Missing or invalid token.' })
   async findOne(
     @Param('id', new ParseUUIDPipe()) id: string,
@@ -72,6 +77,8 @@ export class TasksController {
   @ApiParam({ name: 'id', description: 'Task id (UUID)' })
   @ApiBody({ type: UpdateTaskDto })
   @ApiOkResponse({ description: 'Task updated successfully.' })
+  @ApiForbiddenResponse({ description: 'You are not allowed to update this task.' })
+  @ApiNotFoundResponse({ description: 'Task not found.' })
   @ApiUnauthorizedResponse({ description: 'Missing or invalid token.' })
   async update(
     @Param('id', new ParseUUIDPipe()) id: string,
@@ -86,6 +93,7 @@ export class TasksController {
   @ApiOperation({ summary: 'List tasks by project id' })
   @ApiParam({ name: 'id', description: 'Project id (UUID)' })
   @ApiOkResponse({ description: 'Returns tasks for the project.' })
+  @ApiNotFoundResponse({ description: 'Project not found.' })
   @ApiUnauthorizedResponse({ description: 'Missing or invalid token.' })
   async findByProject(
     @Param('id', new ParseUUIDPipe()) projectId: string,
@@ -99,6 +107,7 @@ export class TasksController {
   @ApiOperation({ summary: 'List tasks by user id' })
   @ApiParam({ name: 'id', description: 'User id (UUID)' })
   @ApiOkResponse({ description: 'Returns tasks for the user.' })
+  @ApiNotFoundResponse({ description: 'User not found.' })
   @ApiUnauthorizedResponse({ description: 'Missing or invalid token.' })
   async findByUser(
     @Param('id', new ParseUUIDPipe()) userId: string,

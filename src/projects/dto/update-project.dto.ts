@@ -5,6 +5,7 @@ import {
   IsArray,
   IsDateString,
   IsEnum,
+  MinLength,
   IsOptional,
   IsString,
   IsUUID,
@@ -12,16 +13,17 @@ import {
 } from 'class-validator';
 
 export class UpdateProjectDto {
-  @ApiPropertyOptional({ example: 'Website Redesign', maxLength: 150 })
+  @ApiPropertyOptional({ example: 'Website Redesign', minLength: 3, maxLength: 100 })
   @IsOptional()
   @IsString()
-  @MaxLength(150)
+  @MinLength(3)
+  @MaxLength(100)
   name?: string;
 
-  @ApiPropertyOptional({ example: 'Updated project scope.' })
+  @ApiPropertyOptional({ example: 'Updated project scope.', maxLength: 500 })
   @IsOptional()
   @IsString()
-  @MaxLength(1000)
+  @MaxLength(500)
   description?: string;
 
   @ApiPropertyOptional({ enum: ProjectStatus, example: 'IN_PROGRESS' })

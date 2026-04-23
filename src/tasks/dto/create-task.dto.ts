@@ -1,8 +1,10 @@
 import { Type } from 'class-transformer';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import {
+  IsIn,
   IsDateString,
   IsNotEmpty,
+  MinLength,
   IsOptional,
   IsString,
   IsUUID,
@@ -10,22 +12,23 @@ import {
 } from 'class-validator';
 
 export class CreateTaskDto {
-  @ApiProperty({ example: 'Implement authentication', maxLength: 150 })
+  @ApiProperty({ example: 'Implement authentication', minLength: 3, maxLength: 100 })
   @IsString()
   @IsNotEmpty()
-  @MaxLength(150)
+  @MinLength(3)
+  @MaxLength(100)
   title!: string;
 
-  @ApiPropertyOptional({ example: 'Implement login and JWT guard.' })
+  @ApiPropertyOptional({ example: 'Implement login and JWT guard.', maxLength: 500 })
   @IsOptional()
   @IsString()
-  @MaxLength(1000)
+  @MaxLength(500)
   description?: string;
 
-  @ApiProperty({ example: 'HIGH', maxLength: 20 })
+  @ApiProperty({ example: 'HIGH', enum: ['LOW', 'MEDIUM', 'HIGH'] })
   @IsString()
   @IsNotEmpty()
-  @MaxLength(20)
+  @IsIn(['LOW', 'MEDIUM', 'HIGH'])
   priority!: string;
 
   @ApiPropertyOptional({ example: '2026-06-30' })

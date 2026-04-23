@@ -3,6 +3,7 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import {
   IsArray,
   IsDateString,
+  MinLength,
   IsOptional,
   IsString,
   IsUUID,
@@ -10,15 +11,16 @@ import {
 } from 'class-validator';
 
 export class CreateProjectDto {
-  @ApiProperty({ example: 'Website Redesign', maxLength: 150 })
+  @ApiProperty({ example: 'Website Redesign', minLength: 3, maxLength: 100 })
   @IsString()
-  @MaxLength(150)
+  @MinLength(3)
+  @MaxLength(100)
   name!: string;
 
-  @ApiPropertyOptional({ example: 'Full redesign for company website.' })
+  @ApiPropertyOptional({ example: 'Full redesign for company website.', maxLength: 500 })
   @IsOptional()
   @IsString()
-  @MaxLength(1000)
+  @MaxLength(500)
   description?: string;
 
   @ApiProperty({ example: '7f7f7078-4ac5-4ebe-9ae2-c131f9114fb8' })

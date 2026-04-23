@@ -11,6 +11,9 @@ import {
 import {
   ApiBearerAuth,
   ApiBody,
+  ApiCreatedResponse,
+  ApiForbiddenResponse,
+  ApiNotFoundResponse,
   ApiOkResponse,
   ApiOperation,
   ApiParam,
@@ -36,7 +39,8 @@ export class ClientsController {
   @Roles(RoleKey.ADMIN)
   @ApiOperation({ summary: 'Create client (admin only)' })
   @ApiBody({ type: CreateClientDto })
-  @ApiOkResponse({ description: 'Client created successfully.' })
+  @ApiCreatedResponse({ description: 'Client created successfully.' })
+  @ApiForbiddenResponse({ description: 'Only admins can create clients.' })
   @ApiUnauthorizedResponse({ description: 'Missing or invalid token.' })
   async create(@Body() dto: CreateClientDto) {
     const data = await this.clientsService.create(dto);
@@ -56,6 +60,7 @@ export class ClientsController {
   @ApiOperation({ summary: 'Get client by id' })
   @ApiParam({ name: 'id', description: 'Client id (UUID)' })
   @ApiOkResponse({ description: 'Returns client details.' })
+  @ApiNotFoundResponse({ description: 'Client not found.' })
   @ApiUnauthorizedResponse({ description: 'Missing or invalid token.' })
   async findOne(@Param('id', new ParseUUIDPipe()) id: string) {
     const data = await this.clientsService.findOne(id);
@@ -68,6 +73,8 @@ export class ClientsController {
   @ApiParam({ name: 'id', description: 'Client id (UUID)' })
   @ApiBody({ type: UpdateClientDto })
   @ApiOkResponse({ description: 'Client updated successfully.' })
+  @ApiForbiddenResponse({ description: 'Only admins can update clients.' })
+  @ApiNotFoundResponse({ description: 'Client not found.' })
   @ApiUnauthorizedResponse({ description: 'Missing or invalid token.' })
   async update(
     @Param('id', new ParseUUIDPipe()) id: string,

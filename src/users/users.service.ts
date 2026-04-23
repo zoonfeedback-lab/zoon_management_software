@@ -11,6 +11,22 @@ import { AuthenticatedUser } from '../auth/interfaces/authenticated-request.inte
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 
+const userPublicSelect = {
+  id: true,
+  email: true,
+  fullName: true,
+  isActive: true,
+  phone: true,
+  jobTitle: true,
+  department: true,
+  experienceLevel: true,
+  skills: true,
+  availabilityStatus: true,
+  createdAt: true,
+  updatedAt: true,
+  role: { select: { key: true, name: true } },
+} as const;
+
 @Injectable()
 export class UsersService {
   constructor(private readonly prisma: PrismaService) {}
@@ -39,7 +55,7 @@ export class UsersService {
           skills: dto.skills ?? [],
           availabilityStatus: dto.availabilityStatus,
         },
-        include: { role: { select: { key: true } } },
+        select: userPublicSelect,
       });
     } catch (error) {
       if (
@@ -54,7 +70,7 @@ export class UsersService {
 
   async findAll() {
     return this.prisma.user.findMany({
-      include: { role: { select: { key: true, name: true } } },
+      select: userPublicSelect,
       orderBy: { createdAt: 'desc' },
     });
   }
@@ -83,7 +99,7 @@ export class UsersService {
         availabilityStatus: dto.availabilityStatus,
         isActive: requester.role === RoleKey.ADMIN ? dto.isActive : undefined,
       },
-      include: { role: { select: { key: true, name: true } } },
+      select: userPublicSelect,
     });
 
     return updated;
@@ -92,7 +108,7 @@ export class UsersService {
   private async getUserByIdOrThrow(id: string) {
     const user = await this.prisma.user.findUnique({
       where: { id },
-      include: { role: { select: { key: true, name: true } } },
+      select: userPublicSelect,
     });
     if (!user) {
       throw new NotFoundException('User not found');
