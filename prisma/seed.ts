@@ -1,10 +1,22 @@
 import { PrismaClient, RoleKey } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
+import * as dotenv from 'dotenv';
+
+dotenv.config();
 
 const prisma = new PrismaClient();
 
 async function main() {
-  const passwordHash = await bcrypt.hash('Admin@123', 10);
+  const adminEmail = process.env.ADMIN_EMAIL;
+  const adminPassword = process.env.ADMIN_PASSWORD;
+
+  if (!adminEmail || !adminPassword) {
+    throw new Error(
+      'ADMIN_EMAIL and ADMIN_PASSWORD must be set in .env to seed the database',
+    );
+  }
+
+  const passwordHash = await bcrypt.hash(adminPassword, 10);
 
   const adminRole = await prisma.role.upsert({
     where: { key: RoleKey.ADMIN },
@@ -25,14 +37,14 @@ async function main() {
   });
 
   const admin = await prisma.user.upsert({
-    where: { email: 'zoon.feedback@gmail.com' },
+    where: { email: adminEmail },
     update: {
       fullName: 'Zoon Admin',
       passwordHash,
       roleId: adminRole.id,
     },
     create: {
-      email: 'zoon.feedback@gmail.com',
+      email: adminEmail,
       passwordHash,
       fullName: 'Zoon Admin',
       roleId: adminRole.id,
