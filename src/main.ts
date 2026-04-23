@@ -1,5 +1,4 @@
-import { ValidationPipe } from '@nestjs/common';
-import { RequestMethod } from '@nestjs/common';
+import { RequestMethod, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import type { Request, Response } from 'express';
@@ -12,7 +11,10 @@ async function bootstrap() {
 
   if (isVercel) {
     app.setGlobalPrefix('api', {
-      exclude: [{ path: 'health', method: RequestMethod.GET }],
+      exclude: [
+        { path: '', method: RequestMethod.GET },
+        { path: 'health', method: RequestMethod.GET },
+      ],
     });
   }
 
@@ -36,13 +38,40 @@ async function bootstrap() {
   }
 
   const document = SwaggerModule.createDocument(app, docsConfig.build());
-  SwaggerModule.setup('docs', app, document);
-
-  // Local alias so /api/docs works like Vercel-style paths.
   const httpAdapter = app.getHttpAdapter();
   const server = httpAdapter.getInstance();
-  server.get('/api/docs', (_req: Request, res: Response) => res.redirect('/docs'));
-  server.get('/api/docs-json', (_req: Request, res: Response) => res.json(document));
+  SwaggerModule.setup('docs', app, document, {
+    useGlobalPrefix: isVercel,
+    customCssUrl: 'https://unpkg.com/swagger-ui-dist@5/swagger-ui.css',
+    customJs: [
+      'https://unpkg.com/swagger-ui-dist@5/swagger-ui-bundle.js',
+      'https://unpkg.com/swagger-ui-dist@5/swagger-ui-standalone-preset.js',
+    ],
+  });
+
+  if (isVercel) {
+    server.get('/docs', (_req: Request, res: Response) => res.redirect('/api/docs'));
+    server.get('/docs-json', (_req: Request, res: Response) => res.redirect('/api/docs-json'));
+    server.get('/api/docs/swagger-ui.css', (_req: Request, res: Response) =>
+      res.redirect('https://unpkg.com/swagger-ui-dist@5/swagger-ui.css'),
+    );
+    server.get('/api/docs/swagger-ui-bundle.js', (_req: Request, res: Response) =>
+      res.redirect('https://unpkg.com/swagger-ui-dist@5/swagger-ui-bundle.js'),
+    );
+    server.get('/api/docs/swagger-ui-standalone-preset.js', (_req: Request, res: Response) =>
+      res.redirect('https://unpkg.com/swagger-ui-dist@5/swagger-ui-standalone-preset.js'),
+    );
+    server.get('/api/docs/favicon-32x32.png', (_req: Request, res: Response) =>
+      res.redirect('https://unpkg.com/swagger-ui-dist@5/favicon-32x32.png'),
+    );
+    server.get('/api/docs/favicon-16x16.png', (_req: Request, res: Response) =>
+      res.redirect('https://unpkg.com/swagger-ui-dist@5/favicon-16x16.png'),
+    );
+  } else {
+    // Local aliases so both /docs and /api/docs work.
+    server.get('/api/docs', (_req: Request, res: Response) => res.redirect('/docs'));
+    server.get('/api/docs-json', (_req: Request, res: Response) => res.json(document));
+  }
 
   await app.listen(process.env.PORT ?? 3000);
 }
