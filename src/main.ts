@@ -1,4 +1,5 @@
-import { RequestMethod, ValidationPipe } from '@nestjs/common';
+import { ValidationPipe } from '@nestjs/common';
+import { RequestMethod } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import type { Request, Response } from 'express';
@@ -11,10 +12,7 @@ async function bootstrap() {
 
   if (isVercel) {
     app.setGlobalPrefix('api', {
-      exclude: [
-        { path: '', method: RequestMethod.GET },
-        { path: 'health', method: RequestMethod.GET },
-      ],
+      exclude: [{ path: 'health', method: RequestMethod.GET }],
     });
   }
 
