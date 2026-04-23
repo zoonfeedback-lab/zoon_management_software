@@ -14,9 +14,10 @@ export class CommentsService {
 
   async create(taskId: string, dto: CreateCommentDto, user: AuthenticatedUser) {
     const task = await this.getTask(taskId);
-    if (user.role !== RoleKey.ADMIN && task.assignedToId !== user.id) {
+    const isMember = await this.isUserProjectMember(task.projectId, user.id);
+    if (user.role !== RoleKey.ADMIN && !isMember) {
       throw new ForbiddenException(
-        'Only assigned users or admin can comment on this task',
+        'Only project members or admin can comment on this task',
       );
     }
 
@@ -34,7 +35,8 @@ export class CommentsService {
 
   async findByTask(taskId: string, user: AuthenticatedUser) {
     const task = await this.getTask(taskId);
-    if (user.role !== RoleKey.ADMIN && task.assignedToId !== user.id) {
+    const isMember = await this.isUserProjectMember(task.projectId, user.id);
+    if (user.role !== RoleKey.ADMIN && !isMember) {
       throw new ForbiddenException('You cannot view comments for this task');
     }
 
@@ -48,11 +50,19 @@ export class CommentsService {
   private async getTask(taskId: string) {
     const task = await this.prisma.task.findUnique({
       where: { id: taskId },
-      select: { id: true, assignedToId: true },
+      select: { id: true, assignedToId: true, projectId: true },
     });
     if (!task) {
       throw new NotFoundException('Task not found');
     }
     return task;
+  }
+
+  private async isUserProjectMember(projectId: string, userId: string) {
+    const membership = await this.prisma.projectMember.findUnique({
+      where: { projectId_userId: { projectId, userId } },
+      select: { id: true },
+    });
+    return Boolean(membership);
   }
 }

@@ -4,22 +4,31 @@ import {
   IsArray,
   IsBoolean,
   IsEnum,
+  Matches,
   IsOptional,
   IsString,
   MaxLength,
+  MinLength,
 } from 'class-validator';
 
 export class UpdateUserDto {
-  @ApiPropertyOptional({ example: 'John Doe', maxLength: 120 })
+  @ApiPropertyOptional({ example: 'John Doe', minLength: 2, maxLength: 50 })
   @IsOptional()
   @IsString()
-  @MaxLength(120)
+  @MinLength(2)
+  @MaxLength(50)
+  @Matches(/^[A-Za-z ]+$/, {
+    message: 'Full name can contain only letters and spaces',
+  })
   fullName?: string;
 
-  @ApiPropertyOptional({ example: '+1-555-0000', maxLength: 40 })
+  @ApiPropertyOptional({ example: '+923001234567', maxLength: 13 })
   @IsOptional()
   @IsString()
-  @MaxLength(40)
+  @MaxLength(13)
+  @Matches(/^(\+92[0-9]{10}|03[0-9]{9})$/, {
+    message: 'Phone must be a valid Pakistan number',
+  })
   phone?: string;
 
   @ApiPropertyOptional({ example: 'Software Engineer', maxLength: 120 })

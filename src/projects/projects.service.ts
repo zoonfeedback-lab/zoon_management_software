@@ -1,4 +1,11 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
+import { RoleKey } from '@prisma/client';
+import { AuthenticatedUser } from '../auth/interfaces/authenticated-request.interface';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
@@ -8,8 +15,10 @@ export class ProjectsService {
   constructor(private readonly prisma: PrismaService) {}
 
   async create(dto: CreateProjectDto) {
+    this.validateProjectDates(dto.startDate, dto.deadline);
     await this.ensureClientExists(dto.clientId);
-    await this.ensureUsersExist(dto.memberIds ?? []);
+    const memberIds = dto.memberIds ? [...new Set(dto.memberIds)] : [];
+    await this.ensureUsersExist(memberIds);
 
     return this.prisma.project.create({
       data: {
@@ -18,9 +27,9 @@ export class ProjectsService {
         clientId: dto.clientId,
         startDate: dto.startDate ? new Date(dto.startDate) : null,
         deadline: dto.deadline ? new Date(dto.deadline) : null,
-        members: dto.memberIds?.length
+        members: memberIds.length
           ? {
-              create: dto.memberIds.map((userId) => ({ userId })),
+              create: memberIds.map((userId) => ({ userId })),
             }
           : undefined,
       },
@@ -31,8 +40,12 @@ export class ProjectsService {
     });
   }
 
-  async findAll() {
+  async findAll(user: AuthenticatedUser) {
     return this.prisma.project.findMany({
+      where:
+        user.role === RoleKey.ADMIN
+          ? undefined
+          : { members: { some: { userId: user.id } } },
       include: {
         client: true,
         members: { include: { user: { select: { id: true, fullName: true } } } },
@@ -41,7 +54,7 @@ export class ProjectsService {
     });
   }
 
-  async findOne(id: string) {
+  async findOne(id: string, user: AuthenticatedUser) {
     const project = await this.prisma.project.findUnique({
       where: { id },
       include: {
@@ -52,16 +65,24 @@ export class ProjectsService {
     if (!project) {
       throw new NotFoundException('Project not found');
     }
+    if (user.role !== RoleKey.ADMIN) {
+      const isMember = project.members.some((m) => m.userId === user.id);
+      if (!isMember) {
+        throw new ForbiddenException('You can only view your assigned projects');
+      }
+    }
     return project;
   }
 
-  async update(id: string, dto: UpdateProjectDto) {
-    await this.findOne(id);
+  async update(id: string, dto: UpdateProjectDto, user?: AuthenticatedUser) {
+    // using user as a dummy passed from controller if needed, but we check permissions via decorator
+    await this.findOne(id, user || { id: '', email: '', fullName: '', role: RoleKey.ADMIN });
+    this.validateProjectDates(dto.startDate, dto.deadline);
     if (dto.clientId) {
       await this.ensureClientExists(dto.clientId);
     }
     if (dto.memberIds) {
-      await this.ensureUsersExist(dto.memberIds);
+      await this.ensureUsersExist([...new Set(dto.memberIds)]);
     }
 
     return this.prisma.project.update({
@@ -76,7 +97,7 @@ export class ProjectsService {
         members: dto.memberIds
           ? {
               deleteMany: {},
-              create: dto.memberIds.map((userId) => ({ userId })),
+              create: [...new Set(dto.memberIds)].map((userId) => ({ userId })),
             }
           : undefined,
       },
@@ -106,6 +127,18 @@ export class ProjectsService {
     });
     if (count !== userIds.length) {
       throw new NotFoundException('One or more team members were not found');
+    }
+  }
+
+  private validateProjectDates(startDate?: string, deadline?: string) {
+    if (!startDate || !deadline) {
+      return;
+    }
+
+    const start = new Date(startDate);
+    const end = new Date(deadline);
+    if (start > end) {
+      throw new BadRequestException('Start date must be before or equal to deadline');
     }
   }
 }

@@ -11,6 +11,9 @@ import {
 import {
   ApiBearerAuth,
   ApiBody,
+  ApiCreatedResponse,
+  ApiForbiddenResponse,
+  ApiNotFoundResponse,
   ApiOkResponse,
   ApiOperation,
   ApiParam,
@@ -38,7 +41,8 @@ export class UsersController {
   @Roles(RoleKey.ADMIN)
   @ApiOperation({ summary: 'Create a new user (admin only)' })
   @ApiBody({ type: CreateUserDto })
-  @ApiOkResponse({ description: 'User created successfully.' })
+  @ApiCreatedResponse({ description: 'User created successfully.' })
+  @ApiForbiddenResponse({ description: 'Only admins can create users.' })
   @ApiUnauthorizedResponse({ description: 'Missing or invalid token.' })
   async create(@Body() dto: CreateUserDto) {
     const data = await this.usersService.create(dto);
@@ -49,6 +53,7 @@ export class UsersController {
   @Roles(RoleKey.ADMIN)
   @ApiOperation({ summary: 'List all users (admin only)' })
   @ApiOkResponse({ description: 'Returns all users.' })
+  @ApiForbiddenResponse({ description: 'Only admins can list all users.' })
   @ApiUnauthorizedResponse({ description: 'Missing or invalid token.' })
   async findAll() {
     const data = await this.usersService.findAll();
@@ -59,6 +64,7 @@ export class UsersController {
   @ApiOperation({ summary: 'Get user by id' })
   @ApiParam({ name: 'id', description: 'User id (UUID)' })
   @ApiOkResponse({ description: 'Returns user details.' })
+  @ApiNotFoundResponse({ description: 'User not found.' })
   @ApiUnauthorizedResponse({ description: 'Missing or invalid token.' })
   async findOne(
     @Param('id', new ParseUUIDPipe()) id: string,
@@ -73,6 +79,8 @@ export class UsersController {
   @ApiParam({ name: 'id', description: 'User id (UUID)' })
   @ApiBody({ type: UpdateUserDto })
   @ApiOkResponse({ description: 'User updated successfully.' })
+  @ApiForbiddenResponse({ description: 'You can update only allowed user records.' })
+  @ApiNotFoundResponse({ description: 'User not found.' })
   @ApiUnauthorizedResponse({ description: 'Missing or invalid token.' })
   async update(
     @Param('id', new ParseUUIDPipe()) id: string,
