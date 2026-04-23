@@ -9,6 +9,9 @@ import { UsersModule } from './users/users.module';
 import { ProjectsModule } from './projects/projects.module';
 import { TasksModule } from './tasks/tasks.module';
 import { CommentsModule } from './comments/comments.module';
+import { ClientPortalModule } from './client-portal/client-portal.module';
+import { DeliverablesModule } from './deliverables/deliverables.module';
+import { AdminModule } from './admin/admin.module';
 
 @Module({
   imports: [
@@ -22,6 +25,9 @@ import { CommentsModule } from './comments/comments.module';
     ProjectsModule,
     TasksModule,
     CommentsModule,
+    ClientPortalModule,
+    DeliverablesModule,
+    AdminModule,
   ],
   controllers: [AppController],
   providers: [AppService],
