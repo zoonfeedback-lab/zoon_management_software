@@ -36,6 +36,15 @@ async function main() {
     },
   });
 
+  await prisma.role.upsert({
+    where: { key: RoleKey.CLIENT },
+    update: { name: 'Client' },
+    create: {
+      key: RoleKey.CLIENT,
+      name: 'Client',
+    },
+  });
+
   const admin = await prisma.user.upsert({
     where: { email: adminEmail },
     update: {

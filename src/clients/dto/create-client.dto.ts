@@ -3,6 +3,7 @@ import {
   IsNotEmpty,
   IsOptional,
   IsString,
+  IsUUID,
   MaxLength,
 } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
@@ -29,4 +30,12 @@ export class CreateClientDto {
   @IsString()
   @MaxLength(40)
   phone?: string;
+
+  @ApiPropertyOptional({
+    example: '7f7f7078-4ac5-4ebe-9ae2-c131f9114fb8',
+    description: 'Optional linked auth user id (should be CLIENT role).',
+  })
+  @IsOptional()
+  @IsUUID()
+  authUserId?: string;
 }
