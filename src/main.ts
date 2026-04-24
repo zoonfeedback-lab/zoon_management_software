@@ -27,9 +27,18 @@ async function bootstrap() {
   const docsConfig = new DocumentBuilder()
     .setTitle('Zoon Management Software API')
     .setDescription(
-      'API documentation for the Zoon Management Software backend.',
+      'Complete API documentation for the Zoon Management Software backend. This includes endpoints for Authentication, Employees, Clients, Projects, Tasks, Deliverables, and the Client Portal.',
     )
     .setVersion('1.0')
+    .addTag('Auth', 'Authentication and current user endpoints')
+    .addTag('Employees', 'Manage internal team members (Internee & Core Team)')
+    .addTag('Clients', 'Manage client organizations')
+    .addTag('Projects', 'Project lifecycle and member management')
+    .addTag('Tasks', 'Task assignments and tracking')
+    .addTag('Comments', 'Discussions on specific tasks')
+    .addTag('Deliverables', 'Manage file assets and project deliverables')
+    .addTag('Client Portal', 'Endpoints specifically for the client-facing application')
+    .addTag('Admin', 'Administrative workflows and status management')
     .addBearerAuth()
     .addServer(isVercel ? '/api' : '/');
 
