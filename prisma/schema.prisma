@@ -10,12 +10,32 @@ datasource db {
 enum RoleKey {
   ADMIN
   TEAM_MEMBER
+  CLIENT
 }
 
 enum ProjectStatus {
   DRAFT
   ACTIVE
   COMPLETED
+}
+
+enum RevisionStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum ApprovalStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum SupportRequestStatus {
+  PENDING
+  IN_PROGRESS
+  RESOLVED
+  REJECTED
 }
 
 enum TaskStatus {
@@ -60,6 +80,8 @@ model User {
   projectMembers     ProjectMember[]
   assignedTasks      Task[]             @relation("AssignedTo")
   comments           TaskComment[]
+  clientProfile      Client?
+  deliverables       Deliverable[]
 
   @@index([roleId])
   @@map("users")
@@ -73,10 +95,17 @@ model Client {
   contactPerson String
   email         String    @unique
   phone         String?
+  authUserId    String?   @unique
+  authUser      User?     @relation(fields: [authUserId], references: [id])
   isActive      Boolean   @default(true)
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
   projects      Project[]
+  notifications ClientNotification[]
+  feedbacks     ClientFeedback[]
+  supportRequests SupportRequest[]
+  revisionRequests RevisionRequest[]
+  approvals      ProjectApproval[]
 
   @@map("clients")
 }
@@ -97,6 +126,11 @@ model Project {
   client      Client        @relation(fields: [clientId], references: [id])
   members     ProjectMember[]
   tasks       Task[]
+  revisionRequests RevisionRequest[]
+  approvals        ProjectApproval[]
+  feedbacks        ClientFeedback[]
+  supportRequests  SupportRequest[]
+  deliverables     Deliverable[]
 
   @@index([clientId])
   @@map("projects")
@@ -155,4 +189,103 @@ model TaskComment {
   @@index([taskId])
   @@index([userId])
   @@map("task_comments")
+}
+
+model RevisionRequest {
+  id          String         @id @default(uuid())
+  description String
+  status      RevisionStatus @default(PENDING)
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+  projectId   String
+  project     Project        @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  clientId    String
+  client      Client         @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+  @@index([clientId])
+  @@map("revision_requests")
+}
+
+model ProjectApproval {
+  id          String         @id @default(uuid())
+  status      ApprovalStatus @default(PENDING)
+  comment     String?
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+  projectId   String
+  project     Project        @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  clientId    String
+  client      Client         @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+  @@index([clientId])
+  @@map("project_approvals")
+}
+
+model ClientNotification {
+  id        String   @id @default(uuid())
+  title     String
+  message   String
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+  clientId  String
+  client    Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
+  @@index([clientId])
+  @@map("client_notifications")
+}
+
+model ClientFeedback {
+  id               String   @id @default(uuid())
+  rating           Int
+  communication    String?
+  quality          String?
+  value            String?
+  wouldRecommend   Boolean
+  createdAt        DateTime @default(now())
+  projectId        String
+  project          Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  clientId         String
+  client           Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
+  @@unique([projectId, clientId])
+  @@index([clientId])
+  @@map("client_feedbacks")
+}
+
+model SupportRequest {
+  id          String               @id @default(uuid())
+  description String
+  status      SupportRequestStatus @default(PENDING)
+  createdAt   DateTime             @default(now())
+  updatedAt   DateTime             @updatedAt
+  projectId   String
+  project     Project              @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  clientId    String
+  client      Client               @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+  @@index([clientId])
+  @@map("support_requests")
+}
+
+// ─── DELIVERABLES ───────────────────────────────────
+
+model Deliverable {
+  id           String   @id @default(uuid())
+  fileName     String
+  fileUrl      String
+  fileType     String?
+  fileSize     Int?
+  description  String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  projectId    String
+  project      Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  uploadedById String
+  uploadedBy   User     @relation(fields: [uploadedById], references: [id])
+
+  @@index([projectId])
+  @@map("deliverables")
 }

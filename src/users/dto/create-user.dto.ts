@@ -4,6 +4,7 @@ import {
   IsArray,
   IsEmail,
   IsEnum,
+  Matches,
   IsOptional,
   IsString,
   MaxLength,
@@ -15,25 +16,36 @@ export class CreateUserDto {
   @IsEmail()
   email!: string;
 
-  @ApiProperty({ minLength: 8, maxLength: 64, example: 'strongPass123' })
+  @ApiProperty({ minLength: 8, maxLength: 64, example: 'Admin@123' })
   @IsString()
   @MinLength(8)
   @MaxLength(64)
+  @Matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z\d]).+$/, {
+    message:
+      'Password must include at least one uppercase letter, one lowercase letter, one number, and one special character',
+  })
   password!: string;
 
-  @ApiProperty({ example: 'John Doe', maxLength: 120 })
+  @ApiProperty({ example: 'John Doe', minLength: 2, maxLength: 50 })
   @IsString()
-  @MaxLength(120)
+  @MinLength(2)
+  @MaxLength(50)
+  @Matches(/^[A-Za-z ]+$/, {
+    message: 'Full name can contain only letters and spaces',
+  })
   fullName!: string;
 
   @ApiProperty({ enum: RoleKey, example: 'ADMIN' })
   @IsEnum(RoleKey)
   role!: RoleKey;
 
-  @ApiPropertyOptional({ example: '+1-555-0000', maxLength: 40 })
+  @ApiPropertyOptional({ example: '+923001234567', maxLength: 13 })
   @IsOptional()
   @IsString()
-  @MaxLength(40)
+  @MaxLength(13)
+  @Matches(/^(\+92[0-9]{10}|03[0-9]{9})$/, {
+    message: 'Phone must be a valid Pakistan number',
+  })
   phone?: string;
 
   @ApiPropertyOptional({ example: 'Software Engineer', maxLength: 120 })

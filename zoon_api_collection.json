@@ -11,7 +11,7 @@
     },
     {
       "key": "token",
-      "value": "your_jwt_token_here",
+      "value": "",
       "type": "string"
     }
   ],
@@ -31,6 +31,21 @@
       "item": [
         {
           "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const res = pm.response.json();",
+                  "if (res.data && res.data.accessToken) {",
+                  "  pm.collectionVariables.set('token', res.data.accessToken);",
+                  "  console.log('Token saved successfully');",
+                  "}"
+                ]
+              }
+            }
+          ],
           "request": {
             "auth": {
               "type": "noauth"
@@ -44,7 +59,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"email\": \"admin@example.com\",\n  \"password\": \"password123\"\n}"
+              "raw": "{\n  \"email\": \"zoon.feedback@gmail.com\",\n  \"password\": \"Admin@123\"\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/auth/login",
@@ -68,10 +83,10 @@
       ]
     },
     {
-      "name": "Users",
+      "name": "Users (Team)",
       "item": [
         {
-          "name": "Create User",
+          "name": "Create Team Member",
           "request": {
             "method": "POST",
             "header": [
@@ -82,7 +97,28 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"email\": \"johndoe@example.com\",\n  \"password\": \"securepassword\",\n  \"fullName\": \"John Doe\",\n  \"role\": \"ADMIN\",\n  \"phone\": \"+1234567890\",\n  \"jobTitle\": \"Software Engineer\",\n  \"department\": \"Engineering\",\n  \"experienceLevel\": \"Senior\",\n  \"skills\": [\"Node.js\", \"NestJS\"],\n  \"availabilityStatus\": \"AVAILABLE\"\n}"
+              "raw": "{\n  \"email\": \"ali.raza@zoon.com\",\n  \"password\": \"Ali@Zoon1\",\n  \"fullName\": \"Ali Raza\",\n  \"role\": \"TEAM_MEMBER\",\n  \"phone\": \"+923001234567\",\n  \"jobTitle\": \"Full Stack Developer\",\n  \"department\": \"Engineering\",\n  \"experienceLevel\": \"Senior\",\n  \"skills\": [\"nestjs\", \"prisma\", \"react\", \"typescript\"],\n  \"availabilityStatus\": \"AVAILABLE\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/users",
+              "host": ["{{baseUrl}}"],
+              "path": ["users"]
+            }
+          }
+        },
+        {
+          "name": "Create Admin User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"sara.khan@zoon.com\",\n  \"password\": \"Sara@Zoon1\",\n  \"fullName\": \"Sara Khan\",\n  \"role\": \"ADMIN\",\n  \"phone\": \"+923009876543\",\n  \"jobTitle\": \"Project Manager\",\n  \"department\": \"Management\",\n  \"experienceLevel\": \"Lead\",\n  \"skills\": [\"project management\", \"agile\", \"scrum\"],\n  \"availabilityStatus\": \"AVAILABLE\"\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/users",
@@ -115,7 +151,7 @@
               "variable": [
                 {
                   "key": "id",
-                  "value": "uuid-goes-here"
+                  "value": "paste-user-uuid-here"
                 }
               ]
             }
@@ -133,7 +169,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"fullName\": \"John Doe Updated\",\n  \"phone\": \"+0987654321\"\n}"
+              "raw": "{\n  \"fullName\": \"Ali Raza Khan\",\n  \"phone\": \"+923331234567\",\n  \"jobTitle\": \"Lead Developer\",\n  \"department\": \"Engineering\",\n  \"experienceLevel\": \"Lead\",\n  \"skills\": [\"nestjs\", \"prisma\", \"react\", \"nextjs\", \"docker\"],\n  \"availabilityStatus\": \"BUSY\",\n  \"isActive\": true\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/users/:id",
@@ -142,7 +178,7 @@
               "variable": [
                 {
                   "key": "id",
-                  "value": "uuid-goes-here"
+                  "value": "paste-user-uuid-here"
                 }
               ]
             }
@@ -165,7 +201,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"companyName\": \"Acme Corp\",\n  \"contactPerson\": \"Jane Smith\",\n  \"email\": \"contact@acme.com\",\n  \"phone\": \"+1122334455\"\n}"
+              "raw": "{\n  \"companyName\": \"TechVision Solutions\",\n  \"contactPerson\": \"Ahmed Malik\",\n  \"email\": \"ahmed@techvision.pk\",\n  \"phone\": \"+923211234567\"\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/clients",
@@ -198,7 +234,7 @@
               "variable": [
                 {
                   "key": "id",
-                  "value": "uuid-goes-here"
+                  "value": "paste-client-uuid-here"
                 }
               ]
             }
@@ -216,7 +252,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"contactPerson\": \"Jane Smith Updated\"\n}"
+              "raw": "{\n  \"contactPerson\": \"Ahmed Malik Updated\",\n  \"phone\": \"+923451234567\"\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/clients/:id",
@@ -225,7 +261,7 @@
               "variable": [
                 {
                   "key": "id",
-                  "value": "uuid-goes-here"
+                  "value": "paste-client-uuid-here"
                 }
               ]
             }
@@ -248,7 +284,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"name\": \"New Website Launch\",\n  \"description\": \"Project to launch our new e-commerce website\",\n  \"clientId\": \"client-uuid-goes-here\",\n  \"startDate\": \"2023-11-01T00:00:00Z\",\n  \"deadline\": \"2024-01-31T00:00:00Z\",\n  \"memberIds\": [\"user-uuid-1\", \"user-uuid-2\"]\n}"
+              "raw": "{\n  \"name\": \"Zoon Dashboard Redesign\",\n  \"description\": \"Redesign the client portal dashboard with modern UI components and real-time analytics\",\n  \"clientId\": \"paste-client-uuid-here\",\n  \"startDate\": \"2026-05-01T00:00:00Z\",\n  \"deadline\": \"2026-07-31T00:00:00Z\",\n  \"memberIds\": [\"paste-user-uuid-1\", \"paste-user-uuid-2\"]\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/projects",
@@ -281,7 +317,7 @@
               "variable": [
                 {
                   "key": "id",
-                  "value": "uuid-goes-here"
+                  "value": "paste-project-uuid-here"
                 }
               ]
             }
@@ -299,7 +335,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"description\": \"Updated description\"\n}"
+              "raw": "{\n  \"description\": \"Updated: Full dashboard redesign with dark mode support and performance optimizations\"\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/projects/:id",
@@ -308,7 +344,7 @@
               "variable": [
                 {
                   "key": "id",
-                  "value": "uuid-goes-here"
+                  "value": "paste-project-uuid-here"
                 }
               ]
             }
@@ -331,7 +367,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"title\": \"Design Homepage\",\n  \"description\": \"Create a mockup for the homepage\",\n  \"priority\": \"High\",\n  \"dueDate\": \"2023-11-15T00:00:00Z\",\n  \"projectId\": \"project-uuid-goes-here\",\n  \"assignedToId\": \"user-uuid-goes-here\"\n}"
+              "raw": "{\n  \"title\": \"Setup Authentication Module\",\n  \"description\": \"Implement JWT-based auth with role guards and token refresh\",\n  \"priority\": \"High\",\n  \"dueDate\": \"2026-05-15T00:00:00Z\",\n  \"projectId\": \"paste-project-uuid-here\",\n  \"assignedToId\": \"paste-user-uuid-here\"\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/tasks",
@@ -364,7 +400,7 @@
               "variable": [
                 {
                   "key": "id",
-                  "value": "uuid-goes-here"
+                  "value": "paste-task-uuid-here"
                 }
               ]
             }
@@ -391,7 +427,7 @@
               "variable": [
                 {
                   "key": "id",
-                  "value": "uuid-goes-here"
+                  "value": "paste-task-uuid-here"
                 }
               ]
             }
@@ -409,7 +445,7 @@
               "variable": [
                 {
                   "key": "id",
-                  "value": "project-uuid-goes-here"
+                  "value": "paste-project-uuid-here"
                 }
               ]
             }
@@ -427,7 +463,7 @@
               "variable": [
                 {
                   "key": "id",
-                  "value": "user-uuid-goes-here"
+                  "value": "paste-user-uuid-here"
                 }
               ]
             }
@@ -450,7 +486,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"content\": \"This is a sample comment on the task.\"\n}"
+              "raw": "{\n  \"content\": \"Auth module implementation is progressing well. JWT refresh token logic is complete.\"\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/tasks/:id/comments",
@@ -459,7 +495,7 @@
               "variable": [
                 {
                   "key": "id",
-                  "value": "task-uuid-goes-here"
+                  "value": "paste-task-uuid-here"
                 }
               ]
             }
@@ -477,7 +513,7 @@
               "variable": [
                 {
                   "key": "id",
-                  "value": "task-uuid-goes-here"
+                  "value": "paste-task-uuid-here"
                 }
               ]
             }

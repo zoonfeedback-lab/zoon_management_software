@@ -1,9 +1,10 @@
 import {
   ConflictException,
+  ForbiddenException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { Prisma } from '@prisma/client';
+import { Prisma, RoleKey } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateClientDto } from './dto/create-client.dto';
 import { UpdateClientDto } from './dto/update-client.dto';
@@ -13,6 +14,10 @@ export class ClientsService {
   constructor(private readonly prisma: PrismaService) {}
 
   async create(dto: CreateClientDto) {
+    if (dto.authUserId) {
+      await this.ensureClientRoleUser(dto.authUserId);
+    }
+
     try {
       return await this.prisma.client.create({
         data: {
@@ -20,6 +25,7 @@ export class ClientsService {
           contactPerson: dto.contactPerson.trim(),
           email: dto.email.toLowerCase().trim(),
           phone: dto.phone?.trim() ?? null,
+          authUserId: dto.authUserId,
         },
       });
     } catch (error) {
@@ -53,6 +59,9 @@ export class ClientsService {
 
   async update(id: string, dto: UpdateClientDto) {
     await this.ensureExists(id);
+    if (dto.authUserId) {
+      await this.ensureClientRoleUser(dto.authUserId);
+    }
     try {
       return await this.prisma.client.update({
         where: { id },
@@ -61,6 +70,7 @@ export class ClientsService {
           contactPerson: dto.contactPerson?.trim(),
           email: dto.email?.toLowerCase().trim(),
           phone: dto.phone?.trim(),
+          authUserId: dto.authUserId,
         },
       });
     } catch (error) {
@@ -84,4 +94,16 @@ export class ClientsService {
     }
   }
 
+  private async ensureClientRoleUser(userId: string) {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: { id: true, role: { select: { key: true } } },
+    });
+    if (!user) {
+      throw new NotFoundException('Linked user not found');
+    }
+    if (user.role.key !== RoleKey.CLIENT) {
+      throw new ForbiddenException('Linked user must have CLIENT role');
+    }
+  }
 }

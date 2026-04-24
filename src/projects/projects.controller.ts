@@ -11,6 +11,9 @@ import {
 import {
   ApiBearerAuth,
   ApiBody,
+  ApiCreatedResponse,
+  ApiForbiddenResponse,
+  ApiNotFoundResponse,
   ApiOkResponse,
   ApiOperation,
   ApiParam,
@@ -21,6 +24,8 @@ import { RoleKey } from '@prisma/client';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
+import { CurrentUser } from '../auth/decorators/current-user.decorator';
+import type { AuthenticatedUser } from '../auth/interfaces/authenticated-request.interface';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
 import { ProjectsService } from './projects.service';
@@ -36,7 +41,8 @@ export class ProjectsController {
   @Roles(RoleKey.ADMIN)
   @ApiOperation({ summary: 'Create project (admin only)' })
   @ApiBody({ type: CreateProjectDto })
-  @ApiOkResponse({ description: 'Project created successfully.' })
+  @ApiCreatedResponse({ description: 'Project created successfully.' })
+  @ApiForbiddenResponse({ description: 'Only admins can create projects.' })
   @ApiUnauthorizedResponse({ description: 'Missing or invalid token.' })
   async create(@Body() dto: CreateProjectDto) {
     const data = await this.projectsService.create(dto);
@@ -47,8 +53,8 @@ export class ProjectsController {
   @ApiOperation({ summary: 'List all projects' })
   @ApiOkResponse({ description: 'Returns all projects.' })
   @ApiUnauthorizedResponse({ description: 'Missing or invalid token.' })
-  async findAll() {
-    const data = await this.projectsService.findAll();
+  async findAll(@CurrentUser() user: AuthenticatedUser) {
+    const data = await this.projectsService.findAll(user);
     return { data };
   }
 
@@ -56,9 +62,13 @@ export class ProjectsController {
   @ApiOperation({ summary: 'Get project by id' })
   @ApiParam({ name: 'id', description: 'Project id (UUID)' })
   @ApiOkResponse({ description: 'Returns project details.' })
+  @ApiNotFoundResponse({ description: 'Project not found.' })
   @ApiUnauthorizedResponse({ description: 'Missing or invalid token.' })
-  async findOne(@Param('id', new ParseUUIDPipe()) id: string) {
-    const data = await this.projectsService.findOne(id);
+  async findOne(
+    @Param('id', new ParseUUIDPipe()) id: string,
+    @CurrentUser() user: AuthenticatedUser,
+  ) {
+    const data = await this.projectsService.findOne(id, user);
     return { data };
   }
 
@@ -68,12 +78,15 @@ export class ProjectsController {
   @ApiParam({ name: 'id', description: 'Project id (UUID)' })
   @ApiBody({ type: UpdateProjectDto })
   @ApiOkResponse({ description: 'Project updated successfully.' })
+  @ApiForbiddenResponse({ description: 'Only admins can update projects.' })
+  @ApiNotFoundResponse({ description: 'Project not found.' })
   @ApiUnauthorizedResponse({ description: 'Missing or invalid token.' })
   async update(
     @Param('id', new ParseUUIDPipe()) id: string,
     @Body() dto: UpdateProjectDto,
+    @CurrentUser() user: AuthenticatedUser,
   ) {
-    const data = await this.projectsService.update(id, dto);
+    const data = await this.projectsService.update(id, dto, user);
     return { data };
   }
 }

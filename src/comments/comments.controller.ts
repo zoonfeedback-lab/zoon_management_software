@@ -10,6 +10,8 @@ import {
 import {
   ApiBearerAuth,
   ApiBody,
+  ApiCreatedResponse,
+  ApiNotFoundResponse,
   ApiOkResponse,
   ApiOperation,
   ApiParam,
@@ -34,7 +36,8 @@ export class CommentsController {
   @ApiOperation({ summary: 'Create comment for task' })
   @ApiParam({ name: 'id', description: 'Task id (UUID)' })
   @ApiBody({ type: CreateCommentDto })
-  @ApiOkResponse({ description: 'Comment created successfully.' })
+  @ApiCreatedResponse({ description: 'Comment created successfully.' })
+  @ApiNotFoundResponse({ description: 'Task not found.' })
   @ApiUnauthorizedResponse({ description: 'Missing or invalid token.' })
   async create(
     @Param('id', new ParseUUIDPipe()) taskId: string,
@@ -49,6 +52,7 @@ export class CommentsController {
   @ApiOperation({ summary: 'List comments for task' })
   @ApiParam({ name: 'id', description: 'Task id (UUID)' })
   @ApiOkResponse({ description: 'Returns comments for the task.' })
+  @ApiNotFoundResponse({ description: 'Task not found.' })
   @ApiUnauthorizedResponse({ description: 'Missing or invalid token.' })
   async findByTask(
     @Param('id', new ParseUUIDPipe()) taskId: string,
