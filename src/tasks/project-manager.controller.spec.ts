@@ -35,7 +35,7 @@ describe('ProjectManagerController', () => {
     id: 'tm-1',
     email: 'manager@test.com',
     fullName: 'Project Manager',
-    role: RoleKey.TEAM_MEMBER,
+    role: RoleKey.CORE_TEAM,
   };
 
   beforeEach(async () => {

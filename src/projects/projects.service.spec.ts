@@ -5,7 +5,7 @@ import { PrismaService } from '../prisma/prisma.service';
 
 interface MockPrisma {
   client: { findUnique: jest.Mock };
-  user: { count: jest.Mock };
+  user: { count: jest.Mock; findUnique: jest.Mock };
   project: {
     create: jest.Mock;
     findMany: jest.Mock;
@@ -85,7 +85,7 @@ describe('ProjectsService (unit)', () => {
       prisma.client.findUnique.mockResolvedValue({ id: 'client-1' });
       prisma.user.findUnique.mockResolvedValue({
         id: 'pm-1',
-        role: { key: RoleKey.TEAM_MEMBER },
+        role: { key: RoleKey.CORE_TEAM },
         isActive: true,
       });
       prisma.user.count.mockResolvedValue(0);
@@ -154,7 +154,7 @@ describe('ProjectsService (unit)', () => {
         id: 'u-1',
         email: 'user@test.com',
         fullName: 'User',
-        role: RoleKey.TEAM_MEMBER,
+        role: RoleKey.CORE_TEAM,
       });
 
       expect(prisma.project.findMany).toHaveBeenCalledWith(
@@ -173,7 +173,7 @@ describe('ProjectsService (unit)', () => {
       });
       prisma.user.findUnique.mockResolvedValue({
         id: 'new-pm',
-        role: { key: RoleKey.TEAM_MEMBER },
+        role: { key: RoleKey.CORE_TEAM },
         isActive: true,
       });
       prisma.project.update.mockResolvedValue({ id: 'p-1', projectManagerId: 'new-pm' });

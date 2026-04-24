@@ -38,7 +38,7 @@ export class TasksController {
   constructor(private readonly tasksService: TasksService) {}
 
   @Post('tasks')
-  @Roles(RoleKey.ADMIN, RoleKey.TEAM_MEMBER)
+  @Roles(RoleKey.ADMIN, RoleKey.CORE_TEAM)
   @ApiOperation({ summary: 'Create task (admin and project managers only)' })
   @ApiBody({ type: CreateTaskDto })
   @ApiCreatedResponse({ description: 'Task created successfully.' })

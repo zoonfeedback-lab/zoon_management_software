@@ -41,7 +41,7 @@ export class ProjectsController {
   @Roles(RoleKey.ADMIN)
   @ApiOperation({
     summary: 'Create project (admin only)',
-    description: 'Admin creates a new project and optionally assigns a project manager (must be TEAM_MEMBER role). The project manager will have access to the project through the project-manager portal.',
+    description: 'Admin creates a new project and optionally assigns a project manager (must be CORE_TEAM role). The project manager will have access to the project through the project-manager portal.',
   })
   @ApiBody({
     type: CreateProjectDto,

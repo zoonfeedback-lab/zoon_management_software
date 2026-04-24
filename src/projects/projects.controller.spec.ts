@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ProjectsController } from './projects.controller';
 import { ProjectsService } from './projects.service';
-import { RoleKey } from '@prisma/client';
+import { RoleKey, ProjectStatus } from '@prisma/client';
 import { AuthenticatedUser } from '../auth/interfaces/authenticated-request.interface';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
@@ -29,7 +29,7 @@ describe('ProjectsController', () => {
     id: 'tm-1',
     email: 'member@test.com',
     fullName: 'Team Member',
-    role: RoleKey.TEAM_MEMBER,
+    role: RoleKey.CORE_TEAM,
   };
 
   beforeEach(async () => {
@@ -144,7 +144,7 @@ describe('ProjectsController', () => {
 
     it('should update project status and team members', async () => {
       const dto = {
-        status: 'ACTIVE',
+        status: ProjectStatus.ACTIVE,
         memberIds: ['tm-1', 'tm-2'],
       };
       const result = { id: 'p-1', ...dto };

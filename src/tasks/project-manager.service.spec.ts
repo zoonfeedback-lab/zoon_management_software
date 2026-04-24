@@ -13,7 +13,7 @@ describe('ProjectManagerService', () => {
     id: 'tm-1',
     email: 'manager@test.com',
     fullName: 'John Manager',
-    role: RoleKey.TEAM_MEMBER,
+    role: RoleKey.CORE_TEAM,
   };
 
   const mockPrismaService = {
@@ -137,7 +137,7 @@ describe('ProjectManagerService', () => {
 
       mockPrismaService.user.findUnique.mockResolvedValue({
         id: 'u-2',
-        role: { key: RoleKey.TEAM_MEMBER },
+        role: { key: RoleKey.CORE_TEAM },
       });
 
       mockPrismaService.projectMember.findUnique.mockResolvedValue(null);
@@ -164,7 +164,7 @@ describe('ProjectManagerService', () => {
 
       mockPrismaService.user.findUnique.mockResolvedValue({
         id: 'u-2',
-        role: { key: RoleKey.TEAM_MEMBER },
+        role: { key: RoleKey.CORE_TEAM },
       });
 
       mockPrismaService.projectMember.findUnique.mockResolvedValue({
