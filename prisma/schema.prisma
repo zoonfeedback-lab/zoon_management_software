@@ -8,7 +8,8 @@ datasource db {
 
 enum RoleKey {
   ADMIN
-  TEAM_MEMBER
+  INTERNEE
+  CORE_TEAM
   CLIENT
 }
 

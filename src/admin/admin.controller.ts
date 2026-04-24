@@ -67,7 +67,9 @@ export class AdminController {
   @ApiParam({ name: 'id', description: 'Project id (UUID)' })
   @ApiOkResponse({ description: 'Returns support requests for the project.' })
   @ApiUnauthorizedResponse({ description: 'Missing or invalid token.' })
-  async listSupportRequests(@Param('id', new ParseUUIDPipe()) projectId: string) {
+  async listSupportRequests(
+    @Param('id', new ParseUUIDPipe()) projectId: string,
+  ) {
     const data = await this.adminService.listSupportRequests(projectId);
     return { data };
   }
@@ -76,7 +78,9 @@ export class AdminController {
   @ApiOperation({ summary: 'Update support request status (admin)' })
   @ApiParam({ name: 'id', description: 'Support request id (UUID)' })
   @ApiBody({ type: UpdateSupportRequestStatusDto })
-  @ApiOkResponse({ description: 'Support request status updated successfully.' })
+  @ApiOkResponse({
+    description: 'Support request status updated successfully.',
+  })
   @ApiUnauthorizedResponse({ description: 'Missing or invalid token.' })
   async updateSupportRequestStatus(
     @Param('id', new ParseUUIDPipe()) id: string,

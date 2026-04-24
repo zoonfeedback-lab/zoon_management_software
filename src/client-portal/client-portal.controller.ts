@@ -67,7 +67,9 @@ export class ClientPortalController {
 
   @Get('dashboard')
   @ApiOperation({ summary: 'Get client dashboard with metrics and updates' })
-  @ApiOkResponse({ description: 'Returns client dashboard metrics and updates.' })
+  @ApiOkResponse({
+    description: 'Returns client dashboard metrics and updates.',
+  })
   @ApiUnauthorizedResponse({ description: 'Missing or invalid token.' })
   async getDashboard(@CurrentUser() user: AuthenticatedUser) {
     const data = await this.clientPortalService.getDashboard(user);
@@ -109,7 +111,10 @@ export class ClientPortalController {
     @Param('id', new ParseUUIDPipe()) projectId: string,
     @CurrentUser() user: AuthenticatedUser,
   ) {
-    const data = await this.clientPortalService.getProjectTasks(projectId, user);
+    const data = await this.clientPortalService.getProjectTasks(
+      projectId,
+      user,
+    );
     return { data };
   }
 
@@ -126,7 +131,11 @@ export class ClientPortalController {
     @Body() dto: CreateCommentDto,
     @CurrentUser() user: AuthenticatedUser,
   ) {
-    const data = await this.clientPortalService.createTaskComment(taskId, dto.content, user);
+    const data = await this.clientPortalService.createTaskComment(
+      taskId,
+      dto.content,
+      user,
+    );
     return { data };
   }
 
@@ -156,7 +165,11 @@ export class ClientPortalController {
     @Body() dto: CreateRevisionRequestDto,
     @CurrentUser() user: AuthenticatedUser,
   ) {
-    const data = await this.clientPortalService.createRevision(projectId, dto, user);
+    const data = await this.clientPortalService.createRevision(
+      projectId,
+      dto,
+      user,
+    );
     return { data };
   }
 
@@ -186,7 +199,11 @@ export class ClientPortalController {
     @Body() dto: CreateApprovalDto,
     @CurrentUser() user: AuthenticatedUser,
   ) {
-    const data = await this.clientPortalService.createApproval(projectId, dto, user);
+    const data = await this.clientPortalService.createApproval(
+      projectId,
+      dto,
+      user,
+    );
     return { data };
   }
 
@@ -214,7 +231,10 @@ export class ClientPortalController {
     @Param('id', new ParseUUIDPipe()) projectId: string,
     @CurrentUser() user: AuthenticatedUser,
   ) {
-    const data = await this.clientPortalService.getDeliverables(projectId, user);
+    const data = await this.clientPortalService.getDeliverables(
+      projectId,
+      user,
+    );
     return { data };
   }
 
@@ -238,7 +258,10 @@ export class ClientPortalController {
     @Param('id', new ParseUUIDPipe()) notificationId: string,
     @CurrentUser() user: AuthenticatedUser,
   ) {
-    const data = await this.clientPortalService.markNotificationRead(notificationId, user);
+    const data = await this.clientPortalService.markNotificationRead(
+      notificationId,
+      user,
+    );
     return { data };
   }
 
@@ -264,7 +287,11 @@ export class ClientPortalController {
     @Body() dto: CreateFeedbackDto,
     @CurrentUser() user: AuthenticatedUser,
   ) {
-    const data = await this.clientPortalService.createFeedback(projectId, dto, user);
+    const data = await this.clientPortalService.createFeedback(
+      projectId,
+      dto,
+      user,
+    );
     return { data };
   }
 
@@ -284,7 +311,9 @@ export class ClientPortalController {
   // ─── 2.11 POST-DELIVERY SUPPORT ───────────────────────
 
   @Post('projects/:id/support-requests')
-  @ApiOperation({ summary: 'Submit post-delivery support request (15-day window)' })
+  @ApiOperation({
+    summary: 'Submit post-delivery support request (15-day window)',
+  })
   @ApiParam({ name: 'id', description: 'Project id (UUID)' })
   @ApiBody({ type: CreateSupportRequestDto })
   @ApiOkResponse({ description: 'Support request submitted.' })
@@ -294,7 +323,11 @@ export class ClientPortalController {
     @Body() dto: CreateSupportRequestDto,
     @CurrentUser() user: AuthenticatedUser,
   ) {
-    const data = await this.clientPortalService.createSupportRequest(projectId, dto, user);
+    const data = await this.clientPortalService.createSupportRequest(
+      projectId,
+      dto,
+      user,
+    );
     return { data };
   }
 
@@ -307,7 +340,10 @@ export class ClientPortalController {
     @Param('id', new ParseUUIDPipe()) projectId: string,
     @CurrentUser() user: AuthenticatedUser,
   ) {
-    const data = await this.clientPortalService.getSupportRequests(projectId, user);
+    const data = await this.clientPortalService.getSupportRequests(
+      projectId,
+      user,
+    );
     return { data };
   }
 }

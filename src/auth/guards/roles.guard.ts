@@ -7,6 +7,7 @@ import {
 import { Reflector } from '@nestjs/core';
 import { RoleKey } from '@prisma/client';
 import { ROLES_KEY } from '../decorators/roles.decorator';
+import type { AuthenticatedRequest } from '../interfaces/authenticated-request.interface';
 
 @Injectable()
 export class RolesGuard implements CanActivate {
@@ -22,7 +23,8 @@ export class RolesGuard implements CanActivate {
       return true;
     }
 
-    const { user } = context.switchToHttp().getRequest();
+    const { user } =
+      context.switchToHttp().getRequest<AuthenticatedRequest>();
     if (!user) {
       throw new ForbiddenException('Access denied');
     }

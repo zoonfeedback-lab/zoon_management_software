@@ -3,7 +3,10 @@ import { ApiPropertyOptional } from '@nestjs/swagger';
 import { IsEnum, IsOptional, IsString, MaxLength } from 'class-validator';
 
 export class CreateApprovalDto {
-  @ApiPropertyOptional({ enum: ApprovalStatus, example: ApprovalStatus.APPROVED })
+  @ApiPropertyOptional({
+    enum: ApprovalStatus,
+    example: ApprovalStatus.APPROVED,
+  })
   @IsOptional()
   @IsEnum(ApprovalStatus)
   status?: ApprovalStatus;

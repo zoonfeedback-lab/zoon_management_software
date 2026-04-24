@@ -118,7 +118,9 @@ export class ClientPortalService {
       where: { clientId: client.id },
       include: {
         members: {
-          include: { user: { select: { id: true, fullName: true, email: true } } },
+          include: {
+            user: { select: { id: true, fullName: true, email: true } },
+          },
         },
       },
       orderBy: { updatedAt: 'desc' },
@@ -131,7 +133,9 @@ export class ClientPortalService {
       where: { id: projectId, clientId: client.id },
       include: {
         members: {
-          include: { user: { select: { id: true, fullName: true, email: true } } },
+          include: {
+            user: { select: { id: true, fullName: true, email: true } },
+          },
         },
       },
     });
@@ -160,7 +164,11 @@ export class ClientPortalService {
 
   // ─── 2.5 COMMUNICATION ────────────────────────────────
 
-  async createTaskComment(taskId: string, content: string, user: AuthenticatedUser) {
+  async createTaskComment(
+    taskId: string,
+    content: string,
+    user: AuthenticatedUser,
+  ) {
     const client = await this.getClientContext(user);
     const task = await this.prisma.task.findUnique({
       where: { id: taskId },
@@ -201,7 +209,11 @@ export class ClientPortalService {
 
   // ─── 2.6 REVISION REQUESTS ────────────────────────────
 
-  async createRevision(projectId: string, dto: CreateRevisionRequestDto, user: AuthenticatedUser) {
+  async createRevision(
+    projectId: string,
+    dto: CreateRevisionRequestDto,
+    user: AuthenticatedUser,
+  ) {
     const client = await this.getClientContext(user);
     await this.getProject(projectId, user);
 
@@ -234,7 +246,11 @@ export class ClientPortalService {
 
   // ─── 2.7 APPROVAL SYSTEM ──────────────────────────────
 
-  async createApproval(projectId: string, dto: CreateApprovalDto, user: AuthenticatedUser) {
+  async createApproval(
+    projectId: string,
+    dto: CreateApprovalDto,
+    user: AuthenticatedUser,
+  ) {
     const client = await this.getClientContext(user);
     await this.getProject(projectId, user);
 
@@ -327,7 +343,11 @@ export class ClientPortalService {
 
   // ─── 2.10 FEEDBACK SYSTEM ─────────────────────────────
 
-  async createFeedback(projectId: string, dto: CreateFeedbackDto, user: AuthenticatedUser) {
+  async createFeedback(
+    projectId: string,
+    dto: CreateFeedbackDto,
+    user: AuthenticatedUser,
+  ) {
     const client = await this.getClientContext(user);
     await this.getProject(projectId, user);
 
@@ -348,7 +368,9 @@ export class ClientPortalService {
         error instanceof Prisma.PrismaClientKnownRequestError &&
         error.code === 'P2002'
       ) {
-        throw new ConflictException('Feedback already submitted for this project');
+        throw new ConflictException(
+          'Feedback already submitted for this project',
+        );
       }
       throw error;
     }
@@ -374,10 +396,14 @@ export class ClientPortalService {
     const project = await this.getProject(projectId, user);
     const now = new Date();
     const deliveryDate = project.updatedAt;
-    const supportDeadline = new Date(deliveryDate.getTime() + 15 * 24 * 60 * 60 * 1000);
+    const supportDeadline = new Date(
+      deliveryDate.getTime() + 15 * 24 * 60 * 60 * 1000,
+    );
 
     if (now > supportDeadline) {
-      throw new ForbiddenException('Support window has expired for this project');
+      throw new ForbiddenException(
+        'Support window has expired for this project',
+      );
     }
 
     return this.prisma.supportRequest.create({
@@ -416,7 +442,9 @@ export class ClientPortalService {
     });
 
     if (!client) {
-      throw new ForbiddenException('No active client profile is linked to this user');
+      throw new ForbiddenException(
+        'No active client profile is linked to this user',
+      );
     }
 
     return client;
@@ -430,7 +458,11 @@ export class ClientPortalService {
     return projects.map((project) => project.id);
   }
 
-  private async createNotification(clientId: string, title: string, message: string) {
+  private async createNotification(
+    clientId: string,
+    title: string,
+    message: string,
+  ) {
     await this.prisma.clientNotification.create({
       data: {
         clientId,

@@ -1,11 +1,23 @@
 import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { RoleKey } from '@prisma/client';
 import { ProjectsService } from './projects.service';
+import { PrismaService } from '../prisma/prisma.service';
+
+interface MockPrisma {
+  client: { findUnique: jest.Mock };
+  user: { count: jest.Mock };
+  project: {
+    create: jest.Mock;
+    findMany: jest.Mock;
+    findUnique: jest.Mock;
+    update: jest.Mock;
+  };
+}
 
 describe('ProjectsService (unit)', () => {
   let service: ProjectsService;
 
-  const prisma = {
+  const prisma: MockPrisma = {
     client: { findUnique: jest.fn() },
     user: { count: jest.fn() },
     project: {
@@ -14,11 +26,11 @@ describe('ProjectsService (unit)', () => {
       findUnique: jest.fn(),
       update: jest.fn(),
     },
-  } as any;
+  };
 
   beforeEach(() => {
     jest.clearAllMocks();
-    service = new ProjectsService(prisma);
+    service = new ProjectsService(prisma as unknown as PrismaService);
   });
 
   it('rejects create when startDate is after deadline', async () => {
@@ -48,6 +60,7 @@ describe('ProjectsService (unit)', () => {
     });
     expect(prisma.project.create).toHaveBeenCalledWith(
       expect.objectContaining({
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         data: expect.objectContaining({
           members: {
             create: [{ userId: 'u-1' }, { userId: 'u-2' }],
@@ -74,7 +87,7 @@ describe('ProjectsService (unit)', () => {
       id: 'u-1',
       email: 'user@test.com',
       fullName: 'User',
-      role: RoleKey.TEAM_MEMBER,
+      role: RoleKey.CORE_TEAM,
     });
 
     expect(prisma.project.findMany).toHaveBeenCalledWith(

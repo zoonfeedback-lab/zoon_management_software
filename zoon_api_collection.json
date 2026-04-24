@@ -68,10 +68,10 @@
       ]
     },
     {
-      "name": "Users",
+      "name": "Employees",
       "item": [
         {
-          "name": "Create User",
+          "name": "Create Employee",
           "request": {
             "method": "POST",
             "header": [
@@ -82,36 +82,36 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"email\": \"johndoe@example.com\",\n  \"password\": \"securepassword\",\n  \"fullName\": \"John Doe\",\n  \"role\": \"ADMIN\",\n  \"phone\": \"+1234567890\",\n  \"jobTitle\": \"Software Engineer\",\n  \"department\": \"Engineering\",\n  \"experienceLevel\": \"Senior\",\n  \"skills\": [\"Node.js\", \"NestJS\"],\n  \"availabilityStatus\": \"AVAILABLE\"\n}"
+              "raw": "{\n  \"email\": \"johndoe@example.com\",\n  \"password\": \"securepassword\",\n  \"fullName\": \"John Doe\",\n  \"role\": \"INTERNEE\",\n  \"phone\": \"+1234567890\",\n  \"jobTitle\": \"Software Engineer\",\n  \"department\": \"Engineering\",\n  \"experienceLevel\": \"Senior\",\n  \"skills\": [\"Node.js\", \"NestJS\"],\n  \"availabilityStatus\": \"AVAILABLE\"\n}"
             },
             "url": {
-              "raw": "{{baseUrl}}/users",
+              "raw": "{{baseUrl}}/employees",
               "host": ["{{baseUrl}}"],
-              "path": ["users"]
+              "path": ["employees"]
             }
           }
         },
         {
-          "name": "Get All Users",
+          "name": "Get All Employees",
           "request": {
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/users",
+              "raw": "{{baseUrl}}/employees",
               "host": ["{{baseUrl}}"],
-              "path": ["users"]
+              "path": ["employees"]
             }
           }
         },
         {
-          "name": "Get User by ID",
+          "name": "Get Employee by ID",
           "request": {
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/users/:id",
+              "raw": "{{baseUrl}}/employees/:id",
               "host": ["{{baseUrl}}"],
-              "path": ["users", ":id"],
+              "path": ["employees", ":id"],
               "variable": [
                 {
                   "key": "id",
@@ -122,7 +122,7 @@
           }
         },
         {
-          "name": "Update User",
+          "name": "Update Employee",
           "request": {
             "method": "PATCH",
             "header": [
@@ -136,9 +136,9 @@
               "raw": "{\n  \"fullName\": \"John Doe Updated\",\n  \"phone\": \"+0987654321\"\n}"
             },
             "url": {
-              "raw": "{{baseUrl}}/users/:id",
+              "raw": "{{baseUrl}}/employees/:id",
               "host": ["{{baseUrl}}"],
-              "path": ["users", ":id"],
+              "path": ["employees", ":id"],
               "variable": [
                 {
                   "key": "id",
@@ -416,14 +416,14 @@
           }
         },
         {
-          "name": "Get Tasks by User",
+          "name": "Get Tasks by Employee",
           "request": {
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/users/:id/tasks",
+              "raw": "{{baseUrl}}/employees/:id/tasks",
               "host": ["{{baseUrl}}"],
-              "path": ["users", ":id", "tasks"],
+              "path": ["employees", ":id", "tasks"],
               "variable": [
                 {
                   "key": "id",

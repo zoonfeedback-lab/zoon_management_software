@@ -16,11 +16,20 @@ async function main() {
   });
 
   await prisma.role.upsert({
-    where: { key: RoleKey.TEAM_MEMBER },
-    update: { name: 'Team Member' },
+    where: { key: RoleKey.INTERNEE },
+    update: { name: 'Internee' },
     create: {
-      key: RoleKey.TEAM_MEMBER,
-      name: 'Team Member',
+      key: RoleKey.INTERNEE,
+      name: 'Internee',
+    },
+  });
+
+  await prisma.role.upsert({
+    where: { key: RoleKey.CORE_TEAM },
+    update: { name: 'Core Team' },
+    create: {
+      key: RoleKey.CORE_TEAM,
+      name: 'Core Team',
     },
   });
 

@@ -13,10 +13,13 @@ import { RolesGuard } from './guards/roles.guard';
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => {
         const jwtExpiresIn =
-          (configService.get<string>('JWT_EXPIRES_IN') as StringValue | undefined) ?? '1d';
+          (configService.get<string>('JWT_EXPIRES_IN') as
+            | StringValue
+            | undefined) ?? '1d';
 
         return {
-          secret: configService.get<string>('JWT_SECRET') ?? 'change-this-secret',
+          secret:
+            configService.get<string>('JWT_SECRET') ?? 'change-this-secret',
           signOptions: {
             expiresIn: jwtExpiresIn,
           },
