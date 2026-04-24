@@ -8,10 +8,10 @@ import { Prisma, RoleKey } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 import { PrismaService } from '../prisma/prisma.service';
 import { AuthenticatedUser } from '../auth/interfaces/authenticated-request.interface';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
+import { CreateEmployeeDto } from './dto/create-employee.dto';
+import { UpdateEmployeeDto } from './dto/update-employee.dto';
 
-const userPublicSelect = {
+const employeePublicSelect = {
   id: true,
   email: true,
   fullName: true,
@@ -28,12 +28,12 @@ const userPublicSelect = {
 } as const;
 
 @Injectable()
-export class UsersService {
+export class EmployeesService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async create(dto: CreateUserDto) {
+  async create(dto: CreateEmployeeDto) {
     const role = await this.prisma.role.findUnique({
-      where: { key: dto.role },
+      where: { key: dto.role as RoleKey },
       select: { id: true },
     });
     if (!role) {
@@ -55,14 +55,14 @@ export class UsersService {
           skills: dto.skills ?? [],
           availabilityStatus: dto.availabilityStatus,
         },
-        select: userPublicSelect,
+        select: employeePublicSelect,
       });
     } catch (error) {
       if (
         error instanceof Prisma.PrismaClientKnownRequestError &&
         error.code === 'P2002'
       ) {
-        throw new ConflictException('User email already exists');
+        throw new ConflictException('Employee email already exists');
       }
       throw error;
     }
@@ -70,25 +70,32 @@ export class UsersService {
 
   async findAll() {
     return this.prisma.user.findMany({
-      select: userPublicSelect,
+      where: {
+        role: { key: { in: [RoleKey.INTERNEE, RoleKey.CORE_TEAM] } },
+      },
+      select: employeePublicSelect,
       orderBy: { createdAt: 'desc' },
     });
   }
 
-  async findOne(userId: string, requester: AuthenticatedUser) {
-    if (requester.role !== RoleKey.ADMIN && requester.id !== userId) {
+  async findOne(employeeId: string, requester: AuthenticatedUser) {
+    if (requester.role !== RoleKey.ADMIN && requester.id !== employeeId) {
       throw new ForbiddenException('You can only view your own profile');
     }
-    return this.getUserByIdOrThrow(userId);
+    return this.getEmployeeByIdOrThrow(employeeId);
   }
 
-  async update(userId: string, dto: UpdateUserDto, requester: AuthenticatedUser) {
-    if (requester.role !== RoleKey.ADMIN && requester.id !== userId) {
+  async update(
+    employeeId: string,
+    dto: UpdateEmployeeDto,
+    requester: AuthenticatedUser,
+  ) {
+    if (requester.role !== RoleKey.ADMIN && requester.id !== employeeId) {
       throw new ForbiddenException('You can only update your own profile');
     }
 
     const updated = await this.prisma.user.update({
-      where: { id: userId },
+      where: { id: employeeId },
       data: {
         fullName: dto.fullName?.trim(),
         phone: dto.phone?.trim(),
@@ -99,20 +106,20 @@ export class UsersService {
         availabilityStatus: dto.availabilityStatus,
         isActive: requester.role === RoleKey.ADMIN ? dto.isActive : undefined,
       },
-      select: userPublicSelect,
+      select: employeePublicSelect,
     });
 
     return updated;
   }
 
-  private async getUserByIdOrThrow(id: string) {
-    const user = await this.prisma.user.findUnique({
+  private async getEmployeeByIdOrThrow(id: string) {
+    const employee = await this.prisma.user.findUnique({
       where: { id },
-      select: userPublicSelect,
+      select: employeePublicSelect,
     });
-    if (!user) {
-      throw new NotFoundException('User not found');
+    if (!employee) {
+      throw new NotFoundException('Employee not found');
     }
-    return user;
+    return employee;
   }
 }

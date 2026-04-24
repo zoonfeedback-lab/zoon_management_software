@@ -3,7 +3,8 @@ import { IsString, MaxLength } from 'class-validator';
 
 export class CreateRevisionRequestDto {
   @ApiProperty({
-    example: 'Please revise the final section based on our updated brand guide.',
+    example:
+      'Please revise the final section based on our updated brand guide.',
   })
   @IsString()
   @MaxLength(1500)

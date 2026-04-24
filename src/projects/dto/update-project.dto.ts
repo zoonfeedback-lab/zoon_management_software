@@ -13,7 +13,11 @@ import {
 } from 'class-validator';
 
 export class UpdateProjectDto {
-  @ApiPropertyOptional({ example: 'Website Redesign', minLength: 3, maxLength: 100 })
+  @ApiPropertyOptional({
+    example: 'Website Redesign',
+    minLength: 3,
+    maxLength: 100,
+  })
   @IsOptional()
   @IsString()
   @MinLength(3)

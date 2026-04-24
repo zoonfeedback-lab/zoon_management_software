@@ -16,7 +16,10 @@ export class TasksService {
   async create(dto: CreateTaskDto) {
     await this.ensureProjectExists(dto.projectId);
     if (dto.assignedToId) {
-      await this.ensureAssigneeBelongsToProject(dto.projectId, dto.assignedToId);
+      await this.ensureAssigneeBelongsToProject(
+        dto.projectId,
+        dto.assignedToId,
+      );
     }
 
     return this.prisma.task.create({
@@ -74,7 +77,10 @@ export class TasksService {
       throw new ForbiddenException('Only admin can update task details');
     }
     if (dto.assignedToId) {
-      await this.ensureAssigneeBelongsToProject(existing.projectId, dto.assignedToId);
+      await this.ensureAssigneeBelongsToProject(
+        existing.projectId,
+        dto.assignedToId,
+      );
     }
 
     return this.prisma.task.update({
@@ -83,7 +89,8 @@ export class TasksService {
         title: user.role === RoleKey.ADMIN ? dto.title?.trim() : undefined,
         description:
           user.role === RoleKey.ADMIN ? dto.description?.trim() : undefined,
-        priority: user.role === RoleKey.ADMIN ? dto.priority?.trim() : undefined,
+        priority:
+          user.role === RoleKey.ADMIN ? dto.priority?.trim() : undefined,
         dueDate:
           user.role === RoleKey.ADMIN && dto.dueDate
             ? new Date(dto.dueDate)
@@ -134,7 +141,10 @@ export class TasksService {
     }
   }
 
-  private async ensureAssigneeBelongsToProject(projectId: string, userId: string) {
+  private async ensureAssigneeBelongsToProject(
+    projectId: string,
+    userId: string,
+  ) {
     const member = await this.prisma.projectMember.findUnique({
       where: { projectId_userId: { projectId, userId } },
       select: { id: true },

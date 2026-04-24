@@ -1,16 +1,32 @@
-import { ConflictException, ForbiddenException, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  ForbiddenException,
+  NotFoundException,
+} from '@nestjs/common';
 import { Prisma, RoleKey } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
-import { UsersService } from './users.service';
+import { EmployeesService } from './employees.service';
+import { EmployeeRole } from './dto/create-employee.dto';
+import { PrismaService } from '../prisma/prisma.service';
 
 jest.mock('bcrypt', () => ({
   hash: jest.fn(),
 }));
 
-describe('UsersService (unit)', () => {
-  let service: UsersService;
+interface MockPrisma {
+  role: { findUnique: jest.Mock };
+  user: {
+    create: jest.Mock;
+    findMany: jest.Mock;
+    findUnique: jest.Mock;
+    update: jest.Mock;
+  };
+}
 
-  const prisma = {
+describe('EmployeesService (unit)', () => {
+  let service: EmployeesService;
+
+  const prisma: MockPrisma = {
     role: { findUnique: jest.fn() },
     user: {
       create: jest.fn(),
@@ -18,29 +34,33 @@ describe('UsersService (unit)', () => {
       findUnique: jest.fn(),
       update: jest.fn(),
     },
-  } as any;
+  };
 
   beforeEach(() => {
     jest.clearAllMocks();
-    service = new UsersService(prisma);
+    service = new EmployeesService(prisma as unknown as PrismaService);
   });
 
-  it('creates user with normalized email and hashed password', async () => {
+  it('creates employee with normalized email and hashed password', async () => {
     prisma.role.findUnique.mockResolvedValue({ id: 'role-1' });
     (bcrypt.hash as jest.Mock).mockResolvedValue('hashed-pass');
-    prisma.user.create.mockResolvedValue({ id: 'u-1', email: 'admin@test.com' });
+    prisma.user.create.mockResolvedValue({
+      id: 'u-1',
+      email: 'employee@test.com',
+    });
 
     await service.create({
-      email: '  Admin@Test.com ',
+      email: '  Employee@Test.com ',
       password: 'Admin@123',
       fullName: 'John Doe',
-      role: RoleKey.ADMIN,
+      role: EmployeeRole.INTERNEE,
     });
 
     expect(prisma.user.create).toHaveBeenCalledWith(
       expect.objectContaining({
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         data: expect.objectContaining({
-          email: 'admin@test.com',
+          email: 'employee@test.com',
           passwordHash: 'hashed-pass',
           fullName: 'John Doe',
         }),
@@ -56,7 +76,7 @@ describe('UsersService (unit)', () => {
         email: 'a@test.com',
         password: 'Admin@123',
         fullName: 'John Doe',
-        role: RoleKey.ADMIN,
+        role: EmployeeRole.INTERNEE,
       }),
     ).rejects.toBeInstanceOf(NotFoundException);
   });
@@ -76,7 +96,7 @@ describe('UsersService (unit)', () => {
         email: 'duplicate@test.com',
         password: 'Admin@123',
         fullName: 'John Doe',
-        role: RoleKey.ADMIN,
+        role: EmployeeRole.CORE_TEAM,
       }),
     ).rejects.toBeInstanceOf(ConflictException);
   });
@@ -87,7 +107,7 @@ describe('UsersService (unit)', () => {
         id: 'user-1',
         email: 'u1@test.com',
         fullName: 'U1',
-        role: RoleKey.TEAM_MEMBER,
+        role: RoleKey.CORE_TEAM,
       }),
     ).rejects.toBeInstanceOf(ForbiddenException);
   });

@@ -1,4 +1,4 @@
-import { AvailabilityStatus, RoleKey } from '@prisma/client';
+import { AvailabilityStatus } from '@prisma/client';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import {
   IsArray,
@@ -11,8 +11,13 @@ import {
   MinLength,
 } from 'class-validator';
 
-export class CreateUserDto {
-  @ApiProperty({ example: 'new.user@example.com' })
+export enum EmployeeRole {
+  INTERNEE = 'INTERNEE',
+  CORE_TEAM = 'CORE_TEAM',
+}
+
+export class CreateEmployeeDto {
+  @ApiProperty({ example: 'new.employee@example.com' })
   @IsEmail()
   email!: string;
 
@@ -35,9 +40,9 @@ export class CreateUserDto {
   })
   fullName!: string;
 
-  @ApiProperty({ enum: RoleKey, example: 'ADMIN' })
-  @IsEnum(RoleKey)
-  role!: RoleKey;
+  @ApiProperty({ enum: EmployeeRole, example: 'INTERNEE' })
+  @IsEnum(EmployeeRole)
+  role!: EmployeeRole;
 
   @ApiPropertyOptional({ example: '+923001234567', maxLength: 13 })
   @IsOptional()

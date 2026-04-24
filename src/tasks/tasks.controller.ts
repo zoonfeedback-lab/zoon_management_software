@@ -77,7 +77,9 @@ export class TasksController {
   @ApiParam({ name: 'id', description: 'Task id (UUID)' })
   @ApiBody({ type: UpdateTaskDto })
   @ApiOkResponse({ description: 'Task updated successfully.' })
-  @ApiForbiddenResponse({ description: 'You are not allowed to update this task.' })
+  @ApiForbiddenResponse({
+    description: 'You are not allowed to update this task.',
+  })
   @ApiNotFoundResponse({ description: 'Task not found.' })
   @ApiUnauthorizedResponse({ description: 'Missing or invalid token.' })
   async update(
@@ -103,11 +105,11 @@ export class TasksController {
     return { data };
   }
 
-  @Get('users/:id/tasks')
-  @ApiOperation({ summary: 'List tasks by user id' })
-  @ApiParam({ name: 'id', description: 'User id (UUID)' })
+  @Get('employees/:id/tasks')
+  @ApiOperation({ summary: 'List tasks by employee id' })
+  @ApiParam({ name: 'id', description: 'Employee id (UUID)' })
   @ApiOkResponse({ description: 'Returns tasks for the user.' })
-  @ApiNotFoundResponse({ description: 'User not found.' })
+  @ApiNotFoundResponse({ description: 'Employee not found.' })
   @ApiUnauthorizedResponse({ description: 'Missing or invalid token.' })
   async findByUser(
     @Param('id', new ParseUUIDPipe()) userId: string,
