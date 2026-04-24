@@ -17,6 +17,11 @@ export class ProjectsService {
   async create(dto: CreateProjectDto) {
     this.validateProjectDates(dto.startDate, dto.deadline);
     await this.ensureClientExists(dto.clientId);
+    
+    if (dto.projectManagerId) {
+      await this.ensureProjectManagerIsTeamMember(dto.projectManagerId);
+    }
+    
     const memberIds = dto.memberIds ? [...new Set(dto.memberIds)] : [];
     await this.ensureUsersExist(memberIds);
 
@@ -25,6 +30,7 @@ export class ProjectsService {
         name: dto.name.trim(),
         description: dto.description?.trim() ?? null,
         clientId: dto.clientId,
+        projectManagerId: dto.projectManagerId || null,
         startDate: dto.startDate ? new Date(dto.startDate) : null,
         deadline: dto.deadline ? new Date(dto.deadline) : null,
         members: memberIds.length
@@ -35,9 +41,8 @@ export class ProjectsService {
       },
       include: {
         client: true,
-        members: {
-          include: { user: { select: { id: true, fullName: true } } },
-        },
+        projectManager: { select: { id: true, fullName: true, email: true } },
+        members: { include: { user: { select: { id: true, fullName: true } } } },
       },
     });
   }
@@ -50,9 +55,8 @@ export class ProjectsService {
           : { members: { some: { userId: user.id } } },
       include: {
         client: true,
-        members: {
-          include: { user: { select: { id: true, fullName: true } } },
-        },
+        projectManager: { select: { id: true, fullName: true, email: true } },
+        members: { include: { user: { select: { id: true, fullName: true } } } },
       },
       orderBy: { createdAt: 'desc' },
     });
@@ -63,9 +67,8 @@ export class ProjectsService {
       where: { id },
       include: {
         client: true,
-        members: {
-          include: { user: { select: { id: true, fullName: true } } },
-        },
+        projectManager: { select: { id: true, fullName: true, email: true } },
+        members: { include: { user: { select: { id: true, fullName: true } } } },
       },
     });
     if (!project) {
@@ -92,6 +95,9 @@ export class ProjectsService {
     if (dto.clientId) {
       await this.ensureClientExists(dto.clientId);
     }
+    if (dto.projectManagerId) {
+      await this.ensureProjectManagerIsTeamMember(dto.projectManagerId);
+    }
     if (dto.memberIds) {
       await this.ensureUsersExist([...new Set(dto.memberIds)]);
     }
@@ -103,6 +109,7 @@ export class ProjectsService {
         description: dto.description?.trim(),
         status: dto.status,
         clientId: dto.clientId,
+        projectManagerId: dto.projectManagerId,
         startDate: dto.startDate ? new Date(dto.startDate) : undefined,
         deadline: dto.deadline ? new Date(dto.deadline) : undefined,
         members: dto.memberIds
@@ -114,9 +121,8 @@ export class ProjectsService {
       },
       include: {
         client: true,
-        members: {
-          include: { user: { select: { id: true, fullName: true } } },
-        },
+        projectManager: { select: { id: true, fullName: true, email: true } },
+        members: { include: { user: { select: { id: true, fullName: true } } } },
       },
     });
   }
@@ -128,6 +134,22 @@ export class ProjectsService {
     });
     if (!client) {
       throw new NotFoundException('Client not found');
+    }
+  }
+
+  private async ensureProjectManagerIsTeamMember(userId: string) {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: { id: true, role: { select: { key: true } }, isActive: true },
+    });
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    if (user.role.key !== RoleKey.TEAM_MEMBER) {
+      throw new BadRequestException('Only team members can be project managers');
+    }
+    if (!user.isActive) {
+      throw new BadRequestException('Project manager must be an active user');
     }
   }
 

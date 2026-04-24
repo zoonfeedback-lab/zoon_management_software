@@ -30,6 +30,14 @@ export class CreateProjectDto {
   @IsUUID()
   clientId!: string;
 
+  @ApiPropertyOptional({
+    example: '7f7f7078-4ac5-4ebe-9ae2-c131f9114fb8',
+    description: 'ID of the team member to assign as project manager',
+  })
+  @IsOptional()
+  @IsUUID()
+  projectManagerId?: string;
+
   @ApiPropertyOptional({ example: '2026-05-01' })
   @IsOptional()
   @IsDateString()

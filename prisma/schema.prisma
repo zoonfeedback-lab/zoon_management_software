@@ -83,6 +83,8 @@ model User {
   comments           TaskComment[]
   clientProfile      Client?
   deliverables       Deliverable[]
+  managedProjects    Project[]          @relation("ProjectManager")
+  taskRevisions      TaskRevision[]
 
   @@index([roleId])
   @@map("users")
@@ -114,26 +116,30 @@ model Client {
 // ─── PROJECTS ───────────────────────────────────────
 
 model Project {
-  id          String        @id @default(uuid())
-  name        String
-  description String?
-  status      ProjectStatus @default(DRAFT)
-  startDate   DateTime?
-  deadline    DateTime?
-  isActive    Boolean       @default(true)
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
-  clientId    String
-  client      Client        @relation(fields: [clientId], references: [id])
-  members     ProjectMember[]
-  tasks       Task[]
+  id              String        @id @default(uuid())
+  name            String
+  description     String?
+  status          ProjectStatus @default(DRAFT)
+  startDate       DateTime?
+  deadline        DateTime?
+  isActive        Boolean       @default(true)
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  clientId        String
+  client          Client        @relation(fields: [clientId], references: [id])
+  projectManagerId String?
+  projectManager  User?         @relation("ProjectManager", fields: [projectManagerId], references: [id])
+  members         ProjectMember[]
+  tasks           Task[]
   revisionRequests RevisionRequest[]
   approvals        ProjectApproval[]
   feedbacks        ClientFeedback[]
   supportRequests  SupportRequest[]
   deliverables     Deliverable[]
+  taskRevisions    TaskRevision[]
 
   @@index([clientId])
+  @@index([projectManagerId])
   @@map("projects")
 }
 
@@ -169,10 +175,32 @@ model Task {
   assignedToId String?
   assignedTo   User?       @relation("AssignedTo", fields: [assignedToId], references: [id])
   comments     TaskComment[]
+  revisions    TaskRevision[]
 
   @@index([projectId])
   @@index([assignedToId])
   @@map("tasks")
+}
+
+// ─── TASK REVISIONS ─────────────────────────────────
+
+model TaskRevision {
+  id          String   @id @default(uuid())
+  feedback    String
+  status      RevisionStatus @default(PENDING)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  taskId      String
+  task        Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  projectId   String
+  project     Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  createdById String
+  createdBy   User     @relation(fields: [createdById], references: [id])
+
+  @@index([taskId])
+  @@index([projectId])
+  @@index([createdById])
+  @@map("task_revisions")
 }
 
 // ─── TASK COMMENTS ──────────────────────────────────
