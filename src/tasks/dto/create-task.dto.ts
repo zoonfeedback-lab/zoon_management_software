@@ -12,14 +12,21 @@ import {
 } from 'class-validator';
 
 export class CreateTaskDto {
-  @ApiProperty({ example: 'Implement authentication', minLength: 3, maxLength: 100 })
+  @ApiProperty({
+    example: 'Implement authentication',
+    minLength: 3,
+    maxLength: 100,
+  })
   @IsString()
   @IsNotEmpty()
   @MinLength(3)
   @MaxLength(100)
   title!: string;
 
-  @ApiPropertyOptional({ example: 'Implement login and JWT guard.', maxLength: 500 })
+  @ApiPropertyOptional({
+    example: 'Implement login and JWT guard.',
+    maxLength: 500,
+  })
   @IsOptional()
   @IsString()
   @MaxLength(500)

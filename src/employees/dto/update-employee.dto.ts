@@ -11,7 +11,7 @@ import {
   MinLength,
 } from 'class-validator';
 
-export class UpdateUserDto {
+export class UpdateEmployeeDto {
   @ApiPropertyOptional({ example: 'John Doe', minLength: 2, maxLength: 50 })
   @IsOptional()
   @IsString()

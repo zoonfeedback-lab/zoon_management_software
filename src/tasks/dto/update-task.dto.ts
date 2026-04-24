@@ -13,7 +13,11 @@ import {
 } from 'class-validator';
 
 export class UpdateTaskDto {
-  @ApiPropertyOptional({ example: 'Implement authentication', minLength: 3, maxLength: 100 })
+  @ApiPropertyOptional({
+    example: 'Implement authentication',
+    minLength: 3,
+    maxLength: 100,
+  })
   @IsOptional()
   @IsString()
   @MinLength(3)

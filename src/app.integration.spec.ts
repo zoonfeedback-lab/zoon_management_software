@@ -1,6 +1,7 @@
 import { INestApplication } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import request from 'supertest';
+import type { Server } from 'http';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 
@@ -22,12 +23,18 @@ describe('App routes (integration)', () => {
   });
 
   it('GET / returns welcome text', async () => {
-    await request(app.getHttpServer()).get('/').expect(200).expect('Hello World!');
+    await request(app.getHttpServer() as Server)
+      .get('/')
+      .expect(200)
+      .expect('Hello World!');
   });
 
   it('GET /health returns service status', async () => {
-    await request(app.getHttpServer()).get('/health').expect(200).expect({
-      status: 'ok',
-    });
+    await request(app.getHttpServer() as Server)
+      .get('/health')
+      .expect(200)
+      .expect({
+        status: 'ok',
+      });
   });
 });

@@ -16,7 +16,9 @@ export class AdminService {
     return this.prisma.revisionRequest.findMany({
       where: { projectId },
       include: {
-        client: { select: { id: true, companyName: true, contactPerson: true } },
+        client: {
+          select: { id: true, companyName: true, contactPerson: true },
+        },
       },
       orderBy: { createdAt: 'desc' },
     });
@@ -60,13 +62,18 @@ export class AdminService {
     return this.prisma.supportRequest.findMany({
       where: { projectId },
       include: {
-        client: { select: { id: true, companyName: true, contactPerson: true } },
+        client: {
+          select: { id: true, companyName: true, contactPerson: true },
+        },
       },
       orderBy: { createdAt: 'desc' },
     });
   }
 
-  async updateSupportRequestStatus(id: string, dto: UpdateSupportRequestStatusDto) {
+  async updateSupportRequestStatus(
+    id: string,
+    dto: UpdateSupportRequestStatusDto,
+  ) {
     const request = await this.prisma.supportRequest.findUnique({
       where: { id },
       select: { id: true, clientId: true },

@@ -35,7 +35,9 @@ export class ProjectsService {
       },
       include: {
         client: true,
-        members: { include: { user: { select: { id: true, fullName: true } } } },
+        members: {
+          include: { user: { select: { id: true, fullName: true } } },
+        },
       },
     });
   }
@@ -48,7 +50,9 @@ export class ProjectsService {
           : { members: { some: { userId: user.id } } },
       include: {
         client: true,
-        members: { include: { user: { select: { id: true, fullName: true } } } },
+        members: {
+          include: { user: { select: { id: true, fullName: true } } },
+        },
       },
       orderBy: { createdAt: 'desc' },
     });
@@ -59,7 +63,9 @@ export class ProjectsService {
       where: { id },
       include: {
         client: true,
-        members: { include: { user: { select: { id: true, fullName: true } } } },
+        members: {
+          include: { user: { select: { id: true, fullName: true } } },
+        },
       },
     });
     if (!project) {
@@ -68,7 +74,9 @@ export class ProjectsService {
     if (user.role !== RoleKey.ADMIN) {
       const isMember = project.members.some((m) => m.userId === user.id);
       if (!isMember) {
-        throw new ForbiddenException('You can only view your assigned projects');
+        throw new ForbiddenException(
+          'You can only view your assigned projects',
+        );
       }
     }
     return project;
@@ -76,7 +84,10 @@ export class ProjectsService {
 
   async update(id: string, dto: UpdateProjectDto, user?: AuthenticatedUser) {
     // using user as a dummy passed from controller if needed, but we check permissions via decorator
-    await this.findOne(id, user || { id: '', email: '', fullName: '', role: RoleKey.ADMIN });
+    await this.findOne(
+      id,
+      user || { id: '', email: '', fullName: '', role: RoleKey.ADMIN },
+    );
     this.validateProjectDates(dto.startDate, dto.deadline);
     if (dto.clientId) {
       await this.ensureClientExists(dto.clientId);
@@ -103,7 +114,9 @@ export class ProjectsService {
       },
       include: {
         client: true,
-        members: { include: { user: { select: { id: true, fullName: true } } } },
+        members: {
+          include: { user: { select: { id: true, fullName: true } } },
+        },
       },
     });
   }
@@ -138,7 +151,9 @@ export class ProjectsService {
     const start = new Date(startDate);
     const end = new Date(deadline);
     if (start > end) {
-      throw new BadRequestException('Start date must be before or equal to deadline');
+      throw new BadRequestException(
+        'Start date must be before or equal to deadline',
+      );
     }
   }
 }

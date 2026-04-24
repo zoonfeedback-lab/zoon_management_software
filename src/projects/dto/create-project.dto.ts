@@ -17,7 +17,10 @@ export class CreateProjectDto {
   @MaxLength(100)
   name!: string;
 
-  @ApiPropertyOptional({ example: 'Full redesign for company website.', maxLength: 500 })
+  @ApiPropertyOptional({
+    example: 'Full redesign for company website.',
+    maxLength: 500,
+  })
   @IsOptional()
   @IsString()
   @MaxLength(500)

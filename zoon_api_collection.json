@@ -83,10 +83,10 @@
       ]
     },
     {
-      "name": "Users (Team)",
+      "name": "Employees",
       "item": [
         {
-          "name": "Create Team Member",
+          "name": "Create Employee",
           "request": {
             "method": "POST",
             "header": [
@@ -97,57 +97,36 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"email\": \"ali.raza@zoon.com\",\n  \"password\": \"Ali@Zoon1\",\n  \"fullName\": \"Ali Raza\",\n  \"role\": \"TEAM_MEMBER\",\n  \"phone\": \"+923001234567\",\n  \"jobTitle\": \"Full Stack Developer\",\n  \"department\": \"Engineering\",\n  \"experienceLevel\": \"Senior\",\n  \"skills\": [\"nestjs\", \"prisma\", \"react\", \"typescript\"],\n  \"availabilityStatus\": \"AVAILABLE\"\n}"
+              "raw": "{\n  \"email\": \"johndoe@example.com\",\n  \"password\": \"securepassword\",\n  \"fullName\": \"John Doe\",\n  \"role\": \"INTERNEE\",\n  \"phone\": \"+1234567890\",\n  \"jobTitle\": \"Software Engineer\",\n  \"department\": \"Engineering\",\n  \"experienceLevel\": \"Senior\",\n  \"skills\": [\"Node.js\", \"NestJS\"],\n  \"availabilityStatus\": \"AVAILABLE\"\n}"
             },
             "url": {
-              "raw": "{{baseUrl}}/users",
+              "raw": "{{baseUrl}}/employees",
               "host": ["{{baseUrl}}"],
-              "path": ["users"]
+              "path": ["employees"]
             }
           }
         },
         {
-          "name": "Create Admin User",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"email\": \"sara.khan@zoon.com\",\n  \"password\": \"Sara@Zoon1\",\n  \"fullName\": \"Sara Khan\",\n  \"role\": \"ADMIN\",\n  \"phone\": \"+923009876543\",\n  \"jobTitle\": \"Project Manager\",\n  \"department\": \"Management\",\n  \"experienceLevel\": \"Lead\",\n  \"skills\": [\"project management\", \"agile\", \"scrum\"],\n  \"availabilityStatus\": \"AVAILABLE\"\n}"
-            },
-            "url": {
-              "raw": "{{baseUrl}}/users",
-              "host": ["{{baseUrl}}"],
-              "path": ["users"]
-            }
-          }
-        },
-        {
-          "name": "Get All Users",
+          "name": "Get All Employees",
           "request": {
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/users",
+              "raw": "{{baseUrl}}/employees",
               "host": ["{{baseUrl}}"],
-              "path": ["users"]
+              "path": ["employees"]
             }
           }
         },
         {
-          "name": "Get User by ID",
+          "name": "Get Employee by ID",
           "request": {
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/users/:id",
+              "raw": "{{baseUrl}}/employees/:id",
               "host": ["{{baseUrl}}"],
-              "path": ["users", ":id"],
+              "path": ["employees", ":id"],
               "variable": [
                 {
                   "key": "id",
@@ -158,7 +137,7 @@
           }
         },
         {
-          "name": "Update User",
+          "name": "Update Employee",
           "request": {
             "method": "PATCH",
             "header": [
@@ -172,9 +151,9 @@
               "raw": "{\n  \"fullName\": \"Ali Raza Khan\",\n  \"phone\": \"+923331234567\",\n  \"jobTitle\": \"Lead Developer\",\n  \"department\": \"Engineering\",\n  \"experienceLevel\": \"Lead\",\n  \"skills\": [\"nestjs\", \"prisma\", \"react\", \"nextjs\", \"docker\"],\n  \"availabilityStatus\": \"BUSY\",\n  \"isActive\": true\n}"
             },
             "url": {
-              "raw": "{{baseUrl}}/users/:id",
+              "raw": "{{baseUrl}}/employees/:id",
               "host": ["{{baseUrl}}"],
-              "path": ["users", ":id"],
+              "path": ["employees", ":id"],
               "variable": [
                 {
                   "key": "id",
@@ -452,14 +431,14 @@
           }
         },
         {
-          "name": "Get Tasks by User",
+          "name": "Get Tasks by Employee",
           "request": {
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/users/:id/tasks",
+              "raw": "{{baseUrl}}/employees/:id/tasks",
               "host": ["{{baseUrl}}"],
-              "path": ["users", ":id", "tasks"],
+              "path": ["employees", ":id", "tasks"],
               "variable": [
                 {
                   "key": "id",
