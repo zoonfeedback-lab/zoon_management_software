@@ -38,11 +38,11 @@ export class TasksController {
   constructor(private readonly tasksService: TasksService) {}
 
   @Post('tasks')
-  @Roles(RoleKey.ADMIN)
-  @ApiOperation({ summary: 'Create task (admin only)' })
+  @Roles(RoleKey.ADMIN, RoleKey.TEAM_MEMBER)
+  @ApiOperation({ summary: 'Create task (admin and project managers only)' })
   @ApiBody({ type: CreateTaskDto })
   @ApiCreatedResponse({ description: 'Task created successfully.' })
-  @ApiForbiddenResponse({ description: 'Only admins can create tasks.' })
+  @ApiForbiddenResponse({ description: 'Only admins and project managers can create tasks.' })
   @ApiUnauthorizedResponse({ description: 'Missing or invalid token.' })
   async create(@Body() dto: CreateTaskDto) {
     const data = await this.tasksService.create(dto);

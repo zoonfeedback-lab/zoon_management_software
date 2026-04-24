@@ -39,9 +39,44 @@ export class ProjectsController {
 
   @Post()
   @Roles(RoleKey.ADMIN)
-  @ApiOperation({ summary: 'Create project (admin only)' })
-  @ApiBody({ type: CreateProjectDto })
-  @ApiCreatedResponse({ description: 'Project created successfully.' })
+  @ApiOperation({
+    summary: 'Create project (admin only)',
+    description: 'Admin creates a new project and optionally assigns a project manager (must be TEAM_MEMBER role). The project manager will have access to the project through the project-manager portal.',
+  })
+  @ApiBody({
+    type: CreateProjectDto,
+    examples: {
+      'with-project-manager': {
+        summary: 'Project with assigned project manager',
+        value: {
+          name: 'Website Redesign',
+          description: 'Complete redesign of company website',
+          clientId: '550e8400-e29b-41d4-a716-446655440000',
+          projectManagerId: '660e8400-e29b-41d4-a716-446655440000',
+          startDate: '2026-05-01',
+          deadline: '2026-07-01',
+          memberIds: [
+            '770e8400-e29b-41d4-a716-446655440000',
+            '880e8400-e29b-41d4-a716-446655440000',
+          ],
+        },
+      },
+      'without-project-manager': {
+        summary: 'Project without project manager',
+        value: {
+          name: 'Mobile App Development',
+          description: 'New mobile application',
+          clientId: '550e8400-e29b-41d4-a716-446655440000',
+          startDate: '2026-06-01',
+          deadline: '2026-12-01',
+          memberIds: ['770e8400-e29b-41d4-a716-446655440000'],
+        },
+      },
+    },
+  })
+  @ApiCreatedResponse({
+    description: 'Project created successfully with project manager assigned.',
+  })
   @ApiForbiddenResponse({ description: 'Only admins can create projects.' })
   @ApiUnauthorizedResponse({ description: 'Missing or invalid token.' })
   async create(@Body() dto: CreateProjectDto) {
@@ -50,8 +85,11 @@ export class ProjectsController {
   }
 
   @Get()
-  @ApiOperation({ summary: 'List all projects' })
-  @ApiOkResponse({ description: 'Returns all projects.' })
+  @ApiOperation({
+    summary: 'List all projects',
+    description: 'Admin sees all projects. Team members see only projects they are members of. Project managers will also see their projects in the project-manager portal.',
+  })
+  @ApiOkResponse({ description: 'Returns all projects visible to the user.' })
   @ApiUnauthorizedResponse({ description: 'Missing or invalid token.' })
   async findAll(@CurrentUser() user: AuthenticatedUser) {
     const data = await this.projectsService.findAll(user);
@@ -59,10 +97,21 @@ export class ProjectsController {
   }
 
   @Get(':id')
-  @ApiOperation({ summary: 'Get project by id' })
-  @ApiParam({ name: 'id', description: 'Project id (UUID)' })
+  @ApiOperation({
+    summary: 'Get project by id',
+    description: 'Retrieve detailed information about a specific project including client, project manager, team members, and tasks.',
+  })
+  @ApiParam({
+    name: 'id',
+    description: 'Project id (UUID)',
+    example: '550e8400-e29b-41d4-a716-446655440000',
+  })
   @ApiOkResponse({ description: 'Returns project details.' })
   @ApiNotFoundResponse({ description: 'Project not found.' })
+  @ApiForbiddenResponse({
+    description:
+      'You can only view projects you are assigned to (unless you are an admin).',
+  })
   @ApiUnauthorizedResponse({ description: 'Missing or invalid token.' })
   async findOne(
     @Param('id', new ParseUUIDPipe()) id: string,
@@ -74,9 +123,42 @@ export class ProjectsController {
 
   @Patch(':id')
   @Roles(RoleKey.ADMIN)
-  @ApiOperation({ summary: 'Update project by id (admin only)' })
-  @ApiParam({ name: 'id', description: 'Project id (UUID)' })
-  @ApiBody({ type: UpdateProjectDto })
+  @ApiOperation({
+    summary: 'Update project by id (admin only)',
+    description: 'Update project details including name, status, dates, client, team members, and/or project manager assignment.',
+  })
+  @ApiParam({
+    name: 'id',
+    description: 'Project id (UUID)',
+    example: '550e8400-e29b-41d4-a716-446655440000',
+  })
+  @ApiBody({
+    type: UpdateProjectDto,
+    examples: {
+      'update-project-manager': {
+        summary: 'Change project manager',
+        value: {
+          projectManagerId: '660e8400-e29b-41d4-a716-446655440000',
+        },
+      },
+      'update-status': {
+        summary: 'Update project status',
+        value: {
+          status: 'ACTIVE',
+        },
+      },
+      'add-team-members': {
+        summary: 'Update team members',
+        value: {
+          memberIds: [
+            '770e8400-e29b-41d4-a716-446655440000',
+            '880e8400-e29b-41d4-a716-446655440000',
+            '990e8400-e29b-41d4-a716-446655440000',
+          ],
+        },
+      },
+    },
+  })
   @ApiOkResponse({ description: 'Project updated successfully.' })
   @ApiForbiddenResponse({ description: 'Only admins can update projects.' })
   @ApiNotFoundResponse({ description: 'Project not found.' })
