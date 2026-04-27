@@ -195,6 +195,12 @@ describe('ProjectManagerService', () => {
           assignedToId: 'u-2',
         });
 
+      mockPrismaService.task.update.mockResolvedValue({
+        id: 't-1',
+        projectId: 'p-1',
+        assignedToId: 'u-2',
+      });
+
       const result = await service.assignTask('t-1', 'p-1', 'u-2', teamMemberUser);
 
       expect(result).toBeDefined();
