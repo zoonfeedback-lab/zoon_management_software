@@ -145,7 +145,7 @@ export class ProjectsService {
     if (!user) {
       throw new NotFoundException('User not found');
     }
-    if (user.role.key !== RoleKey.TEAM_MEMBER) {
+    if (user.role.key !== RoleKey.CORE_TEAM) {
       throw new BadRequestException('Only team members can be project managers');
     }
     if (!user.isActive) {

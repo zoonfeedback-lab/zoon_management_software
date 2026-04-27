@@ -11,7 +11,7 @@ export class ProjectManagerService {
    * Get all projects managed by the current user
    */
   async getManagedProjects(user: AuthenticatedUser) {
-    if (user.role !== RoleKey.TEAM_MEMBER) {
+    if (user.role !== RoleKey.CORE_TEAM) {
       throw new ForbiddenException('Only team members can be project managers');
     }
 
@@ -149,7 +149,7 @@ export class ProjectManagerService {
       throw new NotFoundException('User not found');
     }
 
-    if (member.role.key !== RoleKey.TEAM_MEMBER) {
+    if (member.role.key !== RoleKey.CORE_TEAM) {
       throw new BadRequestException('Only team members can be added to projects');
     }
 

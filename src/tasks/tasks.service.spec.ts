@@ -28,7 +28,7 @@ describe('TasksService (unit)', () => {
     id: 'member-1',
     email: 'member@test.com',
     fullName: 'Member',
-    role: RoleKey.TEAM_MEMBER,
+    role: RoleKey.CORE_TEAM,
   };
 
   beforeEach(() => {

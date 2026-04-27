@@ -24,21 +24,21 @@ describe('ProjectManager Workflow Integration Tests', () => {
     id: 'pm-1',
     email: 'manager@test.com',
     fullName: 'John Manager',
-    role: RoleKey.TEAM_MEMBER,
+    role: RoleKey.CORE_TEAM,
   };
 
   const teamMember1: AuthenticatedUser = {
     id: 'tm-1',
     email: 'developer1@test.com',
     fullName: 'Developer 1',
-    role: RoleKey.TEAM_MEMBER,
+    role: RoleKey.CORE_TEAM,
   };
 
   const teamMember2: AuthenticatedUser = {
     id: 'tm-2',
     email: 'developer2@test.com',
     fullName: 'Developer 2',
-    role: RoleKey.TEAM_MEMBER,
+    role: RoleKey.CORE_TEAM,
   };
 
   const mockPrismaService = {
@@ -61,6 +61,7 @@ describe('ProjectManager Workflow Integration Tests', () => {
       create: jest.fn(),
       findMany: jest.fn(),
       update: jest.fn(),
+      findUnique: jest.fn(),
     },
     user: {
       findUnique: jest.fn(),
@@ -185,7 +186,7 @@ describe('ProjectManager Workflow Integration Tests', () => {
 
       mockPrismaService.user.findUnique.mockResolvedValue({
         id: 'tm-3',
-        role: { key: RoleKey.TEAM_MEMBER },
+        role: { key: RoleKey.CORE_TEAM },
       });
 
       mockPrismaService.projectMember.findUnique.mockResolvedValue(null);

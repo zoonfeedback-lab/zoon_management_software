@@ -13,14 +13,14 @@ describe('TaskRevisionService', () => {
     id: 'pm-1',
     email: 'manager@test.com',
     fullName: 'Project Manager',
-    role: RoleKey.TEAM_MEMBER,
+    role: RoleKey.CORE_TEAM,
   };
 
   const teamMemberUser: AuthenticatedUser = {
     id: 'tm-1',
     email: 'developer@test.com',
     fullName: 'Developer',
-    role: RoleKey.TEAM_MEMBER,
+    role: RoleKey.CORE_TEAM,
   };
 
   const mockPrismaService = {
@@ -34,6 +34,7 @@ describe('TaskRevisionService', () => {
       create: jest.fn(),
       findMany: jest.fn(),
       update: jest.fn(),
+      findUnique: jest.fn(),
     },
   };
 

@@ -35,7 +35,7 @@ import { AddTeamMemberDto, RejectRevisionDto } from './dto/project-manager.dto';
 
 @Controller('project-manager')
 @UseGuards(JwtAuthGuard, RolesGuard)
-@Roles(RoleKey.TEAM_MEMBER)
+@Roles(RoleKey.CORE_TEAM)
 @ApiTags('Project Manager Portal')
 @ApiBearerAuth()
 export class ProjectManagerController {
@@ -120,7 +120,7 @@ export class ProjectManagerController {
   @ApiOperation({
     summary: 'Add a team member to a project',
     description:
-      'Add a new team member to your project. The member must be an active employee with the TEAM_MEMBER role. A team member can only be added to one project at a time.',
+      'Add a new team member to your project. The member must be an active employee with the CORE_TEAM role. A team member can only be added to one project at a time.',
   })
   @ApiParam({
     name: 'projectId',
@@ -448,7 +448,7 @@ export class ProjectManagerController {
   // ─── TEAM MEMBER DASHBOARD ──────────────────────────
 
   @Get('my-tasks')
-  @Roles(RoleKey.TEAM_MEMBER)
+  @Roles(RoleKey.CORE_TEAM)
   @ApiOperation({
     summary: 'Get all tasks assigned to current user',
     description:

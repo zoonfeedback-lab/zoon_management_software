@@ -291,7 +291,8 @@ describe('ClientPortalService (unit)', () => {
 
       const result = await service.getFeedback('p-1', clientUser);
 
-      expect(result.id).toBe('f-1');
+      expect(result).toBeDefined();
+      expect(result!.id).toBe('f-1');
     });
   });
 
