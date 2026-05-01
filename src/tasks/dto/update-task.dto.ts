@@ -10,7 +10,10 @@ import {
   IsString,
   IsUUID,
   MaxLength,
+  IsArray,
+  ValidateNested,
 } from 'class-validator';
+import { CreateTaskAttachmentDto } from './create-task-attachment.dto';
 
 export class UpdateTaskDto {
   @ApiPropertyOptional({
@@ -51,4 +54,22 @@ export class UpdateTaskDto {
   @Type(() => String)
   @IsUUID()
   assignedToId?: string;
+
+  @ApiPropertyOptional({
+    description: 'New file attachments to append to the task',
+    type: [CreateTaskAttachmentDto],
+    example: [
+      {
+        fileName: 'updated-spec.pdf',
+        fileUrl: 'https://res.cloudinary.com/dbqdibhht/raw/upload/v1/updated-spec.pdf',
+        fileType: 'application/pdf',
+        fileSize: 102400,
+      },
+    ],
+  })
+  @IsOptional()
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => CreateTaskAttachmentDto)
+  attachments?: CreateTaskAttachmentDto[];
 }

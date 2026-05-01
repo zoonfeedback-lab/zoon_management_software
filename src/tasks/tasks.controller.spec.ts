@@ -18,6 +18,8 @@ describe('TasksController', () => {
     update: jest.fn(),
     findByProject: jest.fn(),
     findByUser: jest.fn(),
+    getTaskAttachments: jest.fn(),
+    deleteAttachment: jest.fn(),
   };
 
   const adminUser: AuthenticatedUser = {
@@ -53,8 +55,8 @@ describe('TasksController', () => {
       const result = { id: 't-1', ...dto };
       mockTasksService.create.mockResolvedValue(result);
 
-      expect(await controller.create(dto)).toEqual({ data: result });
-      expect(mockTasksService.create).toHaveBeenCalledWith(dto);
+      expect(await controller.create(dto, adminUser)).toEqual({ data: result });
+      expect(mockTasksService.create).toHaveBeenCalledWith(dto, 'admin-1');
     });
   });
 

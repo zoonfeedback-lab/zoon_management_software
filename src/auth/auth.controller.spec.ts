@@ -12,6 +12,8 @@ describe('AuthController', () => {
 
   const mockAuthService = {
     login: jest.fn(),
+    employeeLogin: jest.fn(),
+    changePassword: jest.fn(),
     getMe: jest.fn(),
   };
 
@@ -61,6 +63,52 @@ describe('AuthController', () => {
       expect(mockAuthService.login).toHaveBeenCalledWith({
         email: 'admin@test.com',
         password: 'Admin@123',
+      });
+    });
+  });
+
+  describe('employeeLogin', () => {
+    it('should return data envelope with access token and mustChangePassword', async () => {
+      const result = {
+        accessToken: 'emp-jwt',
+        mustChangePassword: true,
+        user: { id: 'emp-1', email: 'emp@test.com', fullName: 'Employee', role: RoleKey.CORE_TEAM },
+      };
+      mockAuthService.employeeLogin.mockResolvedValue(result);
+
+      const response = await controller.employeeLogin({
+        email: 'emp@test.com',
+        password: 'Admin@123',
+      });
+
+      expect(response).toEqual({ data: result });
+      expect(mockAuthService.employeeLogin).toHaveBeenCalledWith({
+        email: 'emp@test.com',
+        password: 'Admin@123',
+      });
+    });
+  });
+
+  describe('changePassword', () => {
+    it('should return success message', async () => {
+      const user: AuthenticatedUser = {
+        id: 'emp-1',
+        email: 'emp@test.com',
+        fullName: 'Employee',
+        role: RoleKey.CORE_TEAM,
+      };
+      const result = { message: 'Password changed successfully' };
+      mockAuthService.changePassword.mockResolvedValue(result);
+
+      const response = await controller.changePassword(
+        { currentPassword: 'Admin@123', newPassword: 'MyNew@456' },
+        user,
+      );
+
+      expect(response).toEqual({ data: result });
+      expect(mockAuthService.changePassword).toHaveBeenCalledWith('emp-1', {
+        currentPassword: 'Admin@123',
+        newPassword: 'MyNew@456',
       });
     });
   });
