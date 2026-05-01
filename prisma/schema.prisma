@@ -73,6 +73,7 @@ model User {
   experienceLevel    String?
   skills             String[]           @default([])
   availabilityStatus AvailabilityStatus @default(AVAILABLE)
+  mustChangePassword Boolean            @default(false)
   createdAt          DateTime           @default(now())
   updatedAt          DateTime           @updatedAt
   roleId             String
@@ -84,6 +85,7 @@ model User {
   deliverables       Deliverable[]
   managedProjects    Project[]          @relation("ProjectManager")
   taskRevisions      TaskRevision[]
+  taskAttachments    TaskAttachment[]   @relation("TaskAttachmentUploader")
 
   @@index([roleId])
   @@map("users")
@@ -175,6 +177,7 @@ model Task {
   assignedTo   User?       @relation("AssignedTo", fields: [assignedToId], references: [id])
   comments     TaskComment[]
   revisions    TaskRevision[]
+  attachments  TaskAttachment[]
 
   @@index([projectId])
   @@index([assignedToId])
@@ -296,6 +299,24 @@ model SupportRequest {
   @@index([projectId])
   @@index([clientId])
   @@map("support_requests")
+}
+
+// ─── TASK ATTACHMENTS ───────────────────────────────
+
+model TaskAttachment {
+  id           String   @id @default(uuid())
+  fileName     String
+  fileUrl      String
+  fileType     String?
+  fileSize     Int?
+  createdAt    DateTime @default(now())
+  taskId       String
+  task         Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  uploadedById String
+  uploadedBy   User     @relation("TaskAttachmentUploader", fields: [uploadedById], references: [id])
+
+  @@index([taskId])
+  @@map("task_attachments")
 }
 
 // ─── DELIVERABLES ───────────────────────────────────

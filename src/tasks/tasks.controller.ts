@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   ParseUUIDPipe,
@@ -39,13 +40,21 @@ export class TasksController {
 
   @Post('tasks')
   @Roles(RoleKey.ADMIN, RoleKey.CORE_TEAM)
-  @ApiOperation({ summary: 'Create task (admin and project managers only)' })
+  @ApiOperation({
+    summary: 'Create task (admin and project managers only)',
+    description:
+      'Create a new task and optionally attach documents or images. ' +
+      'The frontend should upload files to Cloudinary first and pass the resulting URLs.',
+  })
   @ApiBody({ type: CreateTaskDto })
   @ApiCreatedResponse({ description: 'Task created successfully.' })
   @ApiForbiddenResponse({ description: 'Only admins and project managers can create tasks.' })
   @ApiUnauthorizedResponse({ description: 'Missing or invalid token.' })
-  async create(@Body() dto: CreateTaskDto) {
-    const data = await this.tasksService.create(dto);
+  async create(
+    @Body() dto: CreateTaskDto,
+    @CurrentUser() user: AuthenticatedUser,
+  ) {
+    const data = await this.tasksService.create(dto, user.id);
     return { data };
   }
 
@@ -61,7 +70,7 @@ export class TasksController {
   @Get('tasks/:id')
   @ApiOperation({ summary: 'Get task by id' })
   @ApiParam({ name: 'id', description: 'Task id (UUID)' })
-  @ApiOkResponse({ description: 'Returns task details.' })
+  @ApiOkResponse({ description: 'Returns task details with attachments.' })
   @ApiNotFoundResponse({ description: 'Task not found.' })
   @ApiUnauthorizedResponse({ description: 'Missing or invalid token.' })
   async findOne(
@@ -73,7 +82,12 @@ export class TasksController {
   }
 
   @Patch('tasks/:id')
-  @ApiOperation({ summary: 'Update task by id' })
+  @ApiOperation({
+    summary: 'Update task by id',
+    description:
+      'Update task fields and optionally append new attachments. ' +
+      'Provided attachments are added to the existing set (not replaced).',
+  })
   @ApiParam({ name: 'id', description: 'Task id (UUID)' })
   @ApiBody({ type: UpdateTaskDto })
   @ApiOkResponse({ description: 'Task updated successfully.' })
@@ -116,6 +130,42 @@ export class TasksController {
     @CurrentUser() user: AuthenticatedUser,
   ) {
     const data = await this.tasksService.findByUser(userId, user);
+    return { data };
+  }
+
+  // ─── TASK ATTACHMENTS ────────────────────────────────
+
+  @Get('tasks/:id/attachments')
+  @ApiOperation({ summary: 'List all attachments for a task' })
+  @ApiParam({ name: 'id', description: 'Task id (UUID)' })
+  @ApiOkResponse({ description: 'Returns attachments for the task.' })
+  @ApiNotFoundResponse({ description: 'Task not found.' })
+  @ApiUnauthorizedResponse({ description: 'Missing or invalid token.' })
+  async getAttachments(
+    @Param('id', new ParseUUIDPipe()) taskId: string,
+    @CurrentUser() user: AuthenticatedUser,
+  ) {
+    const data = await this.tasksService.getTaskAttachments(taskId, user);
+    return { data };
+  }
+
+  @Delete('tasks/:taskId/attachments/:attachmentId')
+  @Roles(RoleKey.ADMIN, RoleKey.CORE_TEAM)
+  @ApiOperation({
+    summary: 'Delete a task attachment',
+    description: 'Remove an attachment from a task. Allowed for admins, the uploader, or the project manager.',
+  })
+  @ApiParam({ name: 'taskId', description: 'Task id (UUID)' })
+  @ApiParam({ name: 'attachmentId', description: 'Attachment id (UUID)' })
+  @ApiOkResponse({ description: 'Attachment deleted successfully.' })
+  @ApiNotFoundResponse({ description: 'Attachment not found.' })
+  @ApiForbiddenResponse({ description: 'You are not allowed to delete this attachment.' })
+  @ApiUnauthorizedResponse({ description: 'Missing or invalid token.' })
+  async deleteAttachment(
+    @Param('attachmentId', new ParseUUIDPipe()) attachmentId: string,
+    @CurrentUser() user: AuthenticatedUser,
+  ) {
+    const data = await this.tasksService.deleteAttachment(attachmentId, user);
     return { data };
   }
 }

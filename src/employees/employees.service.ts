@@ -54,6 +54,7 @@ export class EmployeesService {
           experienceLevel: dto.experienceLevel?.trim() ?? null,
           skills: dto.skills ?? [],
           availabilityStatus: dto.availabilityStatus,
+          mustChangePassword: true,
         },
         select: employeePublicSelect,
       });

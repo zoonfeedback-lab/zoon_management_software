@@ -248,6 +248,12 @@ export class ProjectManagerService {
           },
           orderBy: { createdAt: 'desc' },
         },
+        attachments: {
+          include: {
+            uploadedBy: { select: { id: true, fullName: true } },
+          },
+          orderBy: { createdAt: 'desc' },
+        },
       },
       orderBy: { createdAt: 'desc' },
     });
@@ -291,6 +297,12 @@ export class ProjectManagerService {
             createdBy: {
               select: { id: true, fullName: true },
             },
+          },
+          orderBy: { createdAt: 'desc' },
+        },
+        attachments: {
+          include: {
+            uploadedBy: { select: { id: true, fullName: true } },
           },
           orderBy: { createdAt: 'desc' },
         },
@@ -390,6 +402,12 @@ export class ProjectManagerService {
             createdBy: {
               select: { id: true, fullName: true },
             },
+          },
+          orderBy: { createdAt: 'desc' },
+        },
+        attachments: {
+          include: {
+            uploadedBy: { select: { id: true, fullName: true } },
           },
           orderBy: { createdAt: 'desc' },
         },
