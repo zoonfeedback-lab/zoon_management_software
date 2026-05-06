@@ -12,6 +12,7 @@ import { CommentsModule } from './comments/comments.module';
 import { ClientPortalModule } from './client-portal/client-portal.module';
 import { DeliverablesModule } from './deliverables/deliverables.module';
 import { AdminModule } from './admin/admin.module';
+import { InternshipApplicationsModule } from './internship-applications/internship-applications.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { AdminModule } from './admin/admin.module';
     ClientPortalModule,
     DeliverablesModule,
     AdminModule,
+    InternshipApplicationsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

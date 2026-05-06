@@ -338,3 +338,57 @@ model Deliverable {
   @@index([projectId])
   @@map("deliverables")
 }
+
+// ─── INTERNSHIP APPLICATIONS ────────────────────────
+
+enum SkillProficiency {
+  BEGINNER
+  INTERMEDIATE
+  ADVANCED
+}
+
+model InternshipApplication {
+  id                      String             @id @default(uuid())
+  fullName                String
+  email                   String             @unique
+  phone                   String
+  universityName          String
+  degreeProgram           String
+  currentSemester         String
+  confidentAreas          String[]           @default([])
+  toolsUsed               String[]           @default([])
+  mostConfidentTool       String
+  mostConfidentToolReason String
+  hasProjects             Boolean            @default(false)
+  problemSolvingAnswer    String
+  createdAt               DateTime           @default(now())
+  updatedAt               DateTime           @updatedAt
+  skills                  ApplicantSkill[]
+  projects                ApplicantProject[]
+
+  @@map("internship_applications")
+}
+
+model ApplicantSkill {
+  id            String             @id @default(uuid())
+  skillName     String
+  proficiency   SkillProficiency   @default(BEGINNER)
+  applicationId String
+  application   InternshipApplication @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+
+  @@index([applicationId])
+  @@map("applicant_skills")
+}
+
+model ApplicantProject {
+  id            String   @id @default(uuid())
+  title         String
+  role          String
+  technologies  String
+  link          String?
+  applicationId String
+  application   InternshipApplication @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+
+  @@index([applicationId])
+  @@map("applicant_projects")
+}
