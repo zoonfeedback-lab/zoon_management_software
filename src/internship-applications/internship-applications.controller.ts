@@ -106,14 +106,11 @@ export class InternshipApplicationsController {
     return { data };
   }
 
-  // ─── ADMIN: Full Update Application (PUT) ─────────
+  // ─── PUBLIC: Full Update Application (PUT) ─────────
 
   @Put(':id')
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(RoleKey.ADMIN)
-  @ApiBearerAuth()
   @ApiOperation({
-    summary: 'Full update of an internship application (admin only)',
+    summary: 'Full update of an internship application (public)',
     description:
       'Replaces the entire internship application with the provided data. All fields should be provided. Skills and projects are replaced entirely.',
   })
@@ -126,10 +123,6 @@ export class InternshipApplicationsController {
   @ApiConflictResponse({
     description: 'An application with this email already exists.',
   })
-  @ApiForbiddenResponse({
-    description: 'Only admins can update applications.',
-  })
-  @ApiUnauthorizedResponse({ description: 'Missing or invalid token.' })
   async update(
     @Param('id', new ParseUUIDPipe()) id: string,
     @Body() dto: UpdateInternshipApplicationDto,
@@ -138,14 +131,11 @@ export class InternshipApplicationsController {
     return { data };
   }
 
-  // ─── ADMIN: Partial Update Application (PATCH) ──────
+  // ─── PUBLIC: Partial Update Application (PATCH) ──────
 
   @Patch(':id')
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(RoleKey.ADMIN)
-  @ApiBearerAuth()
   @ApiOperation({
-    summary: 'Partial update of an internship application (admin only)',
+    summary: 'Partial update of an internship application (public)',
     description:
       'Updates only the provided fields of an internship application. Omitted fields remain unchanged. If skills or projects are provided, they replace the existing ones entirely.',
   })
@@ -158,10 +148,6 @@ export class InternshipApplicationsController {
   @ApiConflictResponse({
     description: 'An application with this email already exists.',
   })
-  @ApiForbiddenResponse({
-    description: 'Only admins can update applications.',
-  })
-  @ApiUnauthorizedResponse({ description: 'Missing or invalid token.' })
   async partialUpdate(
     @Param('id', new ParseUUIDPipe()) id: string,
     @Body() dto: UpdateInternshipApplicationDto,
