@@ -8,10 +8,10 @@ import { Prisma, RoleKey } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 import { PrismaService } from '../prisma/prisma.service';
 import { AuthenticatedUser } from '../auth/interfaces/authenticated-request.interface';
-import { CreateEmployeeDto } from './dto/create-employee.dto';
-import { UpdateEmployeeDto } from './dto/update-employee.dto';
+import { CreateInternDto } from './dto/create-intern.dto';
+import { UpdateInternDto } from './dto/update-intern.dto';
 
-const employeePublicSelect = {
+const internPublicSelect = {
   id: true,
   email: true,
   fullName: true,
@@ -28,16 +28,16 @@ const employeePublicSelect = {
 } as const;
 
 @Injectable()
-export class EmployeesService {
+export class InternsService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async create(dto: CreateEmployeeDto) {
+  async create(dto: CreateInternDto) {
     const role = await this.prisma.role.findUnique({
-      where: { key: RoleKey.CORE_TEAM },
+      where: { key: RoleKey.INTERNEE },
       select: { id: true },
     });
     if (!role) {
-      throw new NotFoundException('CORE_TEAM role not found');
+      throw new NotFoundException('INTERNEE role not found');
     }
 
     try {
@@ -49,21 +49,21 @@ export class EmployeesService {
           fullName: dto.fullName.trim(),
           roleId: role.id,
           phone: dto.phone?.trim() ?? null,
-          jobTitle: dto.jobTitle?.trim() ?? null,
-          department: dto.department?.trim() ?? null,
-          experienceLevel: dto.experienceLevel?.trim() ?? null,
+          jobTitle: dto.degreeProgram?.trim() ?? null,
+          department: dto.universityName?.trim() ?? null,
+          experienceLevel: dto.currentSemester?.trim() ?? null,
           skills: dto.skills ?? [],
           availabilityStatus: dto.availabilityStatus,
           mustChangePassword: true,
         },
-        select: employeePublicSelect,
+        select: internPublicSelect,
       });
     } catch (error) {
       if (
         error instanceof Prisma.PrismaClientKnownRequestError &&
         error.code === 'P2002'
       ) {
-        throw new ConflictException('Employee email already exists');
+        throw new ConflictException('Intern email already exists');
       }
       throw error;
     }
@@ -72,55 +72,55 @@ export class EmployeesService {
   async findAll() {
     return this.prisma.user.findMany({
       where: {
-        role: { key: RoleKey.CORE_TEAM },
+        role: { key: RoleKey.INTERNEE },
       },
-      select: employeePublicSelect,
+      select: internPublicSelect,
       orderBy: { createdAt: 'desc' },
     });
   }
 
-  async findOne(employeeId: string, requester: AuthenticatedUser) {
-    if (requester.role !== RoleKey.ADMIN && requester.id !== employeeId) {
+  async findOne(internId: string, requester: AuthenticatedUser) {
+    if (requester.role !== RoleKey.ADMIN && requester.id !== internId) {
       throw new ForbiddenException('You can only view your own profile');
     }
-    return this.getEmployeeByIdOrThrow(employeeId);
+    return this.getInternByIdOrThrow(internId);
   }
 
   async update(
-    employeeId: string,
-    dto: UpdateEmployeeDto,
+    internId: string,
+    dto: UpdateInternDto,
     requester: AuthenticatedUser,
   ) {
-    if (requester.role !== RoleKey.ADMIN && requester.id !== employeeId) {
+    if (requester.role !== RoleKey.ADMIN && requester.id !== internId) {
       throw new ForbiddenException('You can only update your own profile');
     }
 
     const updated = await this.prisma.user.update({
-      where: { id: employeeId },
+      where: { id: internId },
       data: {
         fullName: dto.fullName?.trim(),
         phone: dto.phone?.trim(),
-        jobTitle: dto.jobTitle?.trim(),
-        department: dto.department?.trim(),
-        experienceLevel: dto.experienceLevel?.trim(),
+        jobTitle: dto.degreeProgram?.trim(),
+        department: dto.universityName?.trim(),
+        experienceLevel: dto.currentSemester?.trim(),
         skills: dto.skills,
         availabilityStatus: dto.availabilityStatus,
         isActive: requester.role === RoleKey.ADMIN ? dto.isActive : undefined,
       },
-      select: employeePublicSelect,
+      select: internPublicSelect,
     });
 
     return updated;
   }
 
-  private async getEmployeeByIdOrThrow(id: string) {
-    const employee = await this.prisma.user.findUnique({
+  private async getInternByIdOrThrow(id: string) {
+    const intern = await this.prisma.user.findUnique({
       where: { id },
-      select: employeePublicSelect,
+      select: internPublicSelect,
     });
-    if (!employee) {
-      throw new NotFoundException('Employee not found');
+    if (!intern) {
+      throw new NotFoundException('Intern not found');
     }
-    return employee;
+    return intern;
   }
 }

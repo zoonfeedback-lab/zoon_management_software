@@ -13,6 +13,7 @@ import { ClientPortalModule } from './client-portal/client-portal.module';
 import { DeliverablesModule } from './deliverables/deliverables.module';
 import { AdminModule } from './admin/admin.module';
 import { InternshipApplicationsModule } from './internship-applications/internship-applications.module';
+import { InternsModule } from './interns/interns.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { InternshipApplicationsModule } from './internship-applications/internsh
     AuthModule,
     ClientsModule,
     EmployeesModule,
+    InternsModule,
     ProjectsModule,
     TasksModule,
     CommentsModule,
