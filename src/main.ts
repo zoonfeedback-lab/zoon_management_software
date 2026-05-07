@@ -39,6 +39,7 @@ async function bootstrap() {
     .addTag('Deliverables', 'Manage file assets and project deliverables')
     .addTag('Client Portal', 'Endpoints specifically for the client-facing application')
     .addTag('Admin', 'Administrative workflows and status management')
+    .addTag('Internship Applications', 'Submit and manage internship application forms')
     .addBearerAuth()
     .addServer(isVercel ? '/api' : '/');
 
