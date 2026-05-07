@@ -32,14 +32,14 @@ import { EmployeesService } from './employees.service';
 
 @Controller('employees')
 @UseGuards(JwtAuthGuard, RolesGuard)
-@ApiTags('Employees')
+@ApiTags('Employees (Core Team)')
 @ApiBearerAuth()
 export class EmployeesController {
   constructor(private readonly employeesService: EmployeesService) {}
 
   @Post()
   @Roles(RoleKey.ADMIN)
-  @ApiOperation({ summary: 'Create a new employee (admin only)' })
+  @ApiOperation({ summary: 'Create a new core-team employee (admin only)' })
   @ApiBody({ type: CreateEmployeeDto })
   @ApiCreatedResponse({ description: 'Employee created successfully.' })
   @ApiForbiddenResponse({ description: 'Only admins can create employees.' })
@@ -51,8 +51,8 @@ export class EmployeesController {
 
   @Get()
   @Roles(RoleKey.ADMIN)
-  @ApiOperation({ summary: 'List all employees (admin only)' })
-  @ApiOkResponse({ description: 'Returns all employees.' })
+  @ApiOperation({ summary: 'List all core-team employees (admin only)' })
+  @ApiOkResponse({ description: 'Returns all core-team employees.' })
   @ApiForbiddenResponse({ description: 'Only admins can list all employees.' })
   @ApiUnauthorizedResponse({ description: 'Missing or invalid token.' })
   async findAll() {
@@ -61,7 +61,7 @@ export class EmployeesController {
   }
 
   @Get(':id')
-  @ApiOperation({ summary: 'Get employee by id' })
+  @ApiOperation({ summary: 'Get core-team employee by id' })
   @ApiParam({ name: 'id', description: 'Employee id (UUID)' })
   @ApiOkResponse({ description: 'Returns employee details.' })
   @ApiNotFoundResponse({ description: 'Employee not found.' })
@@ -75,7 +75,7 @@ export class EmployeesController {
   }
 
   @Patch(':id')
-  @ApiOperation({ summary: 'Update employee by id' })
+  @ApiOperation({ summary: 'Update core-team employee by id' })
   @ApiParam({ name: 'id', description: 'Employee id (UUID)' })
   @ApiBody({ type: UpdateEmployeeDto })
   @ApiOkResponse({ description: 'Employee updated successfully.' })

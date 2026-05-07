@@ -11,8 +11,8 @@ import {
   MinLength,
 } from 'class-validator';
 
-export class CreateEmployeeDto {
-  @ApiProperty({ example: 'new.employee@example.com' })
+export class CreateInternDto {
+  @ApiProperty({ example: 'intern@example.com' })
   @IsEmail()
   email!: string;
 
@@ -26,7 +26,7 @@ export class CreateEmployeeDto {
   })
   password!: string;
 
-  @ApiProperty({ example: 'John Doe', minLength: 2, maxLength: 50 })
+  @ApiProperty({ example: 'Ali Khan', minLength: 2, maxLength: 50 })
   @IsString()
   @MinLength(2)
   @MaxLength(50)
@@ -44,25 +44,25 @@ export class CreateEmployeeDto {
   })
   phone?: string;
 
-  @ApiPropertyOptional({ example: 'Software Engineer', maxLength: 120 })
+  @ApiPropertyOptional({ example: 'COMSATS University Islamabad', maxLength: 120 })
   @IsOptional()
   @IsString()
   @MaxLength(120)
-  jobTitle?: string;
+  universityName?: string;
 
-  @ApiPropertyOptional({ example: 'Engineering', maxLength: 120 })
+  @ApiPropertyOptional({ example: 'BS Computer Science', maxLength: 120 })
   @IsOptional()
   @IsString()
   @MaxLength(120)
-  department?: string;
+  degreeProgram?: string;
 
-  @ApiPropertyOptional({ example: 'Senior', maxLength: 60 })
+  @ApiPropertyOptional({ example: '6th Semester', maxLength: 60 })
   @IsOptional()
   @IsString()
   @MaxLength(60)
-  experienceLevel?: string;
+  currentSemester?: string;
 
-  @ApiPropertyOptional({ type: [String], example: ['nestjs', 'prisma'] })
+  @ApiPropertyOptional({ type: [String], example: ['react', 'typescript'] })
   @IsOptional()
   @IsArray()
   @IsString({ each: true })

@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { Prisma, RoleKey } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
-import { EmployeesService } from './employees.service';
+import { InternsService } from './interns.service';
 import { PrismaService } from '../prisma/prisma.service';
 
 jest.mock('bcrypt', () => ({
@@ -22,8 +22,8 @@ interface MockPrisma {
   };
 }
 
-describe('EmployeesService (unit)', () => {
-  let service: EmployeesService;
+describe('InternsService (unit)', () => {
+  let service: InternsService;
 
   const prisma: MockPrisma = {
     role: { findUnique: jest.fn() },
@@ -37,26 +37,26 @@ describe('EmployeesService (unit)', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    service = new EmployeesService(prisma as unknown as PrismaService);
+    service = new InternsService(prisma as unknown as PrismaService);
   });
 
-  it('creates employee with CORE_TEAM role, normalized email and hashed password', async () => {
-    prisma.role.findUnique.mockResolvedValue({ id: 'role-1' });
+  it('creates intern with INTERNEE role, normalized email and hashed password', async () => {
+    prisma.role.findUnique.mockResolvedValue({ id: 'role-intern' });
     (bcrypt.hash as jest.Mock).mockResolvedValue('hashed-pass');
     prisma.user.create.mockResolvedValue({
-      id: 'u-1',
-      email: 'employee@test.com',
+      id: 'u-intern-1',
+      email: 'intern@test.com',
     });
 
     await service.create({
-      email: '  Employee@Test.com ',
+      email: '  Intern@Test.com ',
       password: 'Admin@123',
-      fullName: 'John Doe',
+      fullName: 'Ali Khan',
     });
 
     expect(prisma.role.findUnique).toHaveBeenCalledWith(
       expect.objectContaining({
-        where: { key: RoleKey.CORE_TEAM },
+        where: { key: RoleKey.INTERNEE },
       }),
     );
 
@@ -64,28 +64,28 @@ describe('EmployeesService (unit)', () => {
       expect.objectContaining({
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         data: expect.objectContaining({
-          email: 'employee@test.com',
+          email: 'intern@test.com',
           passwordHash: 'hashed-pass',
-          fullName: 'John Doe',
+          fullName: 'Ali Khan',
         }),
       }),
     );
   });
 
-  it('throws not found when CORE_TEAM role does not exist', async () => {
+  it('throws not found when INTERNEE role does not exist', async () => {
     prisma.role.findUnique.mockResolvedValue(null);
 
     await expect(
       service.create({
         email: 'a@test.com',
         password: 'Admin@123',
-        fullName: 'John Doe',
+        fullName: 'Ali Khan',
       }),
     ).rejects.toBeInstanceOf(NotFoundException);
   });
 
   it('maps Prisma unique error to conflict exception', async () => {
-    prisma.role.findUnique.mockResolvedValue({ id: 'role-1' });
+    prisma.role.findUnique.mockResolvedValue({ id: 'role-intern' });
     (bcrypt.hash as jest.Mock).mockResolvedValue('hashed-pass');
     prisma.user.create.mockRejectedValue(
       new Prisma.PrismaClientKnownRequestError('Unique failed', {
@@ -98,18 +98,18 @@ describe('EmployeesService (unit)', () => {
       service.create({
         email: 'duplicate@test.com',
         password: 'Admin@123',
-        fullName: 'John Doe',
+        fullName: 'Ali Khan',
       }),
     ).rejects.toBeInstanceOf(ConflictException);
   });
 
-  it('blocks non-admin from reading another profile', async () => {
+  it('blocks non-admin from reading another intern profile', async () => {
     await expect(
-      service.findOne('user-2', {
-        id: 'user-1',
-        email: 'u1@test.com',
-        fullName: 'U1',
-        role: RoleKey.CORE_TEAM,
+      service.findOne('intern-2', {
+        id: 'intern-1',
+        email: 'i1@test.com',
+        fullName: 'I1',
+        role: RoleKey.INTERNEE,
       }),
     ).rejects.toBeInstanceOf(ForbiddenException);
   });
