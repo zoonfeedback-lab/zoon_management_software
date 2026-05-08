@@ -32,7 +32,7 @@ import { EmployeesService } from './employees.service';
 
 @Controller('employees')
 @UseGuards(JwtAuthGuard, RolesGuard)
-@ApiTags('Employees (Core Team)')
+@ApiTags('Employees')
 @ApiBearerAuth()
 export class EmployeesController {
   constructor(private readonly employeesService: EmployeesService) {}

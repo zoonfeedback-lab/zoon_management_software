@@ -54,6 +54,7 @@ export class InternshipApplicationsController {
     description: 'An application with this email already exists.',
   })
   async create(@Body() dto: CreateInternshipApplicationDto) {
+    console.log('Received internship application:', JSON.stringify(dto, null, 2));
     const data = await this.applicationsService.create(dto);
     return { data };
   }

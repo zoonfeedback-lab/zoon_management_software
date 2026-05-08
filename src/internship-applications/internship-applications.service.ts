@@ -84,6 +84,7 @@ export class InternshipApplicationsService {
         select: applicationFullSelect,
       });
     } catch (error) {
+      console.error('Error in InternshipApplicationsService.create:', error);
       if (
         error instanceof Prisma.PrismaClientKnownRequestError &&
         error.code === 'P2002'

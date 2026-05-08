@@ -11,6 +11,9 @@ import {
 import {
   ApiBearerAuth,
   ApiBody,
+  ApiCreatedResponse,
+  ApiForbiddenResponse,
+  ApiNotFoundResponse,
   ApiOkResponse,
   ApiOperation,
   ApiParam,
@@ -25,6 +28,8 @@ import { AdminService } from './admin.service';
 import { UpdateRevisionStatusDto } from './dto/update-revision-status.dto';
 import { UpdateSupportRequestStatusDto } from './dto/update-support-request-status.dto';
 import { SendNotificationDto } from './dto/send-notification.dto';
+import { CreateClientInviteDto } from '../auth/dto/create-client-invite.dto';
+import { UpdateClientDto } from '../clients/dto/update-client.dto';
 
 @Controller('admin')
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -103,6 +108,83 @@ export class AdminController {
     @Body() dto: SendNotificationDto,
   ) {
     const data = await this.adminService.sendNotification(clientId, dto);
+    return { data };
+  }
+
+  // ─── CLIENT MANAGEMENT ────────────────────────────────
+
+  @Get('clients')
+  @ApiTags('Clients')
+  @ApiOperation({ summary: 'List all clients (admin)' })
+  @ApiOkResponse({ description: 'Returns all clients with auth user status.' })
+  async listClients() {
+    const data = await this.adminService.listClients();
+    return { data };
+  }
+
+  @Get('clients/:id')
+  @ApiTags('Clients')
+  @ApiOperation({ summary: 'Get client details by id (admin)' })
+  @ApiParam({ name: 'id', description: 'Client id (UUID)' })
+  @ApiOkResponse({ description: 'Returns client details.' })
+  @ApiNotFoundResponse({ description: 'Client not found.' })
+  async getClient(@Param('id', new ParseUUIDPipe()) id: string) {
+    const data = await this.adminService.getClient(id);
+    return { data };
+  }
+
+  @Post('clients/invite')
+  @ApiTags('Clients')
+  @ApiOperation({
+    summary: 'Create client invite and send one-time setup email (admin)',
+  })
+  @ApiBody({ type: CreateClientInviteDto })
+  @ApiCreatedResponse({ description: 'Client invite created and email sent.' })
+  async createClientInvite(@Body() dto: CreateClientInviteDto) {
+    return this.adminService.createClientInvite(dto);
+  }
+
+  @Patch('clients/:id')
+  @ApiTags('Clients')
+  @ApiOperation({ summary: 'Update client details (admin)' })
+  @ApiParam({ name: 'id', description: 'Client id (UUID)' })
+  @ApiBody({ type: UpdateClientDto })
+  @ApiOkResponse({ description: 'Client updated successfully.' })
+  async updateClient(
+    @Param('id', new ParseUUIDPipe()) id: string,
+    @Body() dto: UpdateClientDto,
+  ) {
+    const data = await this.adminService.updateClient(id, dto);
+    return { data };
+  }
+
+  @Patch('clients/:id/deactivate')
+  @ApiTags('Clients')
+  @ApiOperation({ summary: 'Deactivate client account (admin)' })
+  @ApiParam({ name: 'id', description: 'Client id (UUID)' })
+  @ApiOkResponse({ description: 'Client deactivated successfully.' })
+  async deactivateClient(@Param('id', new ParseUUIDPipe()) id: string) {
+    const data = await this.adminService.deactivateClient(id);
+    return { data };
+  }
+
+  @Post('clients/:id/resend-invite')
+  @ApiTags('Clients')
+  @ApiOperation({ summary: 'Resend setup email to existing client (admin)' })
+  @ApiParam({ name: 'id', description: 'Client id (UUID)' })
+  @ApiOkResponse({ description: 'Invite email resent successfully.' })
+  async resendClientInvite(@Param('id', new ParseUUIDPipe()) id: string) {
+    const data = await this.adminService.resendClientInvite(id);
+    return { data };
+  }
+
+  @Post('clients/:id/revoke-sessions')
+  @ApiTags('Clients')
+  @ApiOperation({ summary: 'Revoke all sessions for a client (admin)' })
+  @ApiParam({ name: 'id', description: 'Client id (UUID)' })
+  @ApiOkResponse({ description: 'All sessions revoked successfully.' })
+  async revokeClientSessions(@Param('id', new ParseUUIDPipe()) id: string) {
+    const data = await this.adminService.revokeClientSessions(id);
     return { data };
   }
 }
