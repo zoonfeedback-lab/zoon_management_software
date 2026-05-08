@@ -4,7 +4,6 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { PrismaModule } from './prisma/prisma.module';
 import { AuthModule } from './auth/auth.module';
-import { ClientsModule } from './clients/clients.module';
 import { EmployeesModule } from './employees/employees.module';
 import { ProjectsModule } from './projects/projects.module';
 import { TasksModule } from './tasks/tasks.module';
@@ -22,7 +21,6 @@ import { InternsModule } from './interns/interns.module';
     }),
     PrismaModule,
     AuthModule,
-    ClientsModule,
     EmployeesModule,
     InternsModule,
     ProjectsModule,

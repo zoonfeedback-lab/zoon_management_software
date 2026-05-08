@@ -65,7 +65,7 @@ model Role {
 model User {
   id                 String             @id @default(uuid())
   email              String             @unique
-  passwordHash       String
+  passwordHash       String?
   fullName           String
   isActive           Boolean            @default(true)
   phone              String?
@@ -87,9 +87,55 @@ model User {
   managedProjects    Project[]          @relation("ProjectManager")
   taskRevisions      TaskRevision[]
   taskAttachments    TaskAttachment[]   @relation("TaskAttachmentUploader")
+  setupTokens        SetupToken[]
+  passwordResetTokens PasswordResetToken[]
+  sessions           Session[]
 
   @@index([roleId])
   @@map("users")
+}
+
+model SetupToken {
+  id        String   @id @default(uuid())
+  tokenHash String   @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([expiresAt])
+  @@map("setup_tokens")
+}
+
+model PasswordResetToken {
+  id        String   @id @default(uuid())
+  tokenHash String   @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([expiresAt])
+  @@map("password_reset_tokens")
+}
+
+model Session {
+  id               String   @id @default(uuid())
+  refreshTokenHash String   @unique
+  expiresAt        DateTime
+  ipAddress        String?
+  userAgent        String?
+  userId           String
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt        DateTime @default(now())
+
+  @@index([userId])
+  @@index([expiresAt])
+  @@map("sessions")
 }
 
 // ─── CLIENTS ────────────────────────────────────────
